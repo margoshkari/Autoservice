@@ -1,3 +1,25 @@
+.cards{
+    display: flex;
+    flex-wrap: wrap;
+}
+
 .card{
-    
+    width: 10%;
+    border: 1px solid black;
+    border-radius: 5%;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-around;
+}
+
+.removeBtn{
+    background-color: rgb(247, 80, 80);
+    color: rgb(255, 255, 255);
+    border: 0;
+    width: 50%;
+    align-self: center;
+    border-radius: 5%;
+}
+.removeBtn:hover{
+    background-color: rgb(179, 28, 28);
 }
