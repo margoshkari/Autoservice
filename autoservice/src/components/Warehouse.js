@@ -6,6 +6,7 @@ function Warehouse(){
     const [modalVisible, setModalVisible] = useState(false);
     const [name, setName] = useState('');
     const [address, setAddress] = useState('');
+    const [editId, setEditId] = useState(null);
 
     //УДАЛЕНИЕ
     function RemoveData(id){
@@ -25,24 +26,50 @@ function Warehouse(){
             Cancel();
         }
     }
+    //ОБНОВЛЕНИЕ
+    function UpdateData() {
+        if(name.length > 0 && address.length > 0){
+            const newData = [...data];
+            const index = newData.findIndex(item => item.id === editId);
+            newData[index] = {id: editId, name: name, address: address};
+            setData(newData);
+            setModalVisible(false);
+            setEditId(null);
+            setName('');
+            setAddress('');
+        } else {
+            Cancel();
+        }
+      }
+      function EditData(id){
+        const item = data.find(item => item.id === id);
+        setName(item.name);
+        setAddress(item.address);
+        setEditId(item.id);
+        setModalVisible(true);
+    }
     function Cancel(){
         setModalVisible(false);
         setName('');
         setAddress('');
     }
     return (
-        <div>
+        <div className={styles.content}>
             {modalVisible && (
             <div className={styles.modal}>
                 <div className={styles.modalBlock}>
                     <button className={styles.cancelBtn} onClick={Cancel}>X</button>
                     <input placeholder='Name...' value={name} onChange={(e) => setName(e.target.value)}></input>
                     <input placeholder='Address...' value={address} onChange={(e) => setAddress(e.target.value)}></input>
-                    <button className={styles.modalAddBtn} onClick={AddData}>Add</button>
+                    {!editId ? 
+                    <button className={styles.modalAddBtn} onClick={AddData}>Add</button> :
+                    <button className={styles.modalAddBtn} onClick={UpdateData}>Update</button>
+                    }
+                    
                 </div>
             </div>
             )}
-            <button onClick={() => setModalVisible(true)}>Add Data</button>
+            <button className={styles.addBtn} onClick={() => setModalVisible(true)}>Add Data</button>
             <div className={styles.cards}>
                         {!data ? (<div>No warehouse found</div>) : 
                             data.map((item) => {
@@ -51,6 +78,7 @@ function Warehouse(){
                                         <h2>{item.name}</h2>
                                         <h3>{item.address}</h3>
                                         <button className={styles.removeBtn} onClick={() => RemoveData(item.id)}>Remove</button>
+                                        <button className={styles.updateBtn} onClick={() => EditData(item.id)}>Update</button>
                                     </div>
                                 );
                         })}         

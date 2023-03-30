@@ -1,3 +1,10 @@
+.content{
+    margin: 20px;
+}
+
+h2, h3{
+    margin: 3%;
+}
 .cards{
     display: flex;
     flex-wrap: wrap;
@@ -19,12 +26,27 @@
     width: 50%;
     align-self: center;
     border-radius: 5%;
+    margin-bottom: 5%;
+}
+.updateBtn{
+    background-color: rgb(199, 239, 255);
+    color: rgb(0, 0, 0);
+    border: 0;
+    width: 50%;
+    align-self: center;
+    border-radius: 5%;
+    margin-bottom: 5%;
 }
 .removeBtn:hover{
     background-color: rgb(179, 28, 28);
 }
+.updateBtn:hover{
+    background-color: rgb(182, 216, 230);
+}
 .modal{
     position: absolute;
+    top: 0;
+    left: 0;
     width: 100%;
     height: 100vh;
     background-color: rgba(100, 100, 100, 0.247);
@@ -64,4 +86,13 @@ input{
     align-self: center;
     border-radius: 5%;
     margin: 5% 0 5% 0;
+}
+
+.addBtn{
+    border: 0;
+    width: 10%;
+    height: 7%;
+    font-size: 0.9vw;
+    align-self: center;
+    border-radius: 5%;
 }
