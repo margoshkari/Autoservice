@@ -23,3 +23,45 @@
 .removeBtn:hover{
     background-color: rgb(179, 28, 28);
 }
+.modal{
+    position: absolute;
+    width: 100%;
+    height: 100vh;
+    background-color: rgba(100, 100, 100, 0.247);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+.modalBlock{
+    background-color: rgb(255, 255, 255);
+    width: 30%;
+    height: auto;
+    border-radius: 3%;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+.cancelBtn{
+    border: 0;
+    background-color: rgb(255, 255, 255);
+    font-size: 1vw;
+    align-self: flex-end;
+    margin: 3% 5% 0 0;
+}
+
+input{
+    width: 50%;
+    margin-top: 5%;
+    height: 7%;
+    font-size: 1vw;
+}
+
+.modalAddBtn{
+    border: 0;
+    width: 20%;
+    height: 7%;
+    font-size: 0.9vw;
+    align-self: center;
+    border-radius: 5%;
+    margin: 5% 0 5% 0;
+}
