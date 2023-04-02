@@ -1,11 +1,13 @@
 import {useState, useEffect, useRef} from 'react';
 import styles from '../styles/CardsModule.module.css'
 
-function Warehouse(){
+
+function Category(){
     const [data, setData] = useState([]);
+    const [category, setCategory] = useState({});
     const [modalVisible, setModalVisible] = useState(false);
     const [name, setName] = useState('');
-    const [address, setAddress] = useState('');
+    const [parentCategory, setParentCategory] = useState(0);
     const [editId, setEditId] = useState(null);
     const isMountedRef = useRef(false);
 
@@ -17,10 +19,47 @@ function Warehouse(){
         isMountedRef.current = true;
     }, [])
 
-    //ПОЛУЧЕНИЕ ВСЕХ СКЛАДОВ
+    //ПОЛУЧЕНИЕ ВСЕХ КАТЕГОРИЙ
     async function GetAllData(){
         try {
-            await fetch("/warehouse",
+            await fetch("http://localhost:5000/category",
+            {
+                method: "GET",
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+            })
+            .then((res) => res.json())
+            .then((data) => setData(data))
+        } catch (error) {
+            console.error(error);
+        }
+    }
+    //ПОЛУЧЕНИЕ КАТЕГОРИИ ПО ID
+    async function GetById(id){
+        try {
+            await fetch(`http://localhost:5000/category/${id}`,
+            {
+                method: "GET",
+                headers: {
+                    'Content-Type': 'application/json'
+                  },
+            })
+            .then((res) => res.json())
+            .then((data) => setCategory(data))
+        } catch (error) {
+            console.error(error);
+        }
+    }
+    //ПОЛУЧЕНИЕ НАЗВАНИЯ РОДИТЕЛЬСКОЙ КАТЕГОРИИ
+    function GetCategoryNameById(id){
+        const index = data.findIndex(item => item.id === Number(id));
+        return data[index] ? data[index].name : undefined;
+    }
+    //ФИЛЬТР КАТЕГОРИЙ ПО РОДИТЕЛЬСКОМУ ID
+    async function GetByParentId(id){
+        try {
+            await fetch(`/category?parentId=${id}`,
             {
                 method: "GET",
                 headers: {
@@ -33,26 +72,11 @@ function Warehouse(){
             console.error(error);
         }
     }
-    //ПОЛУЧЕНИЕ СКЛАДА ПО ID
-    async function GetById(id){
-        try {
-            await fetch(`/warehouse/${id}`,
-            {
-                method: "GET",
-                headers: {
-                    'Content-Type': 'application/json'
-                  },
-            })
-            .then((res) => res.json())
-            .then((data) => console.log(data))
-        } catch (error) {
-            console.error(error);
-        }
-    }
     //ДОБАВЛЕНИЕ
     async function AddData(){
-        if(name.length > 0 && address.length > 0){
-                await fetch(`/warehouse/create`,
+        console.log(parentCategory)
+        if(name.length > 0 && parentCategory >= 0){
+                await fetch(`http://localhost:5000/category/create`,
                 {
                     method: "POST",
                     headers: {
@@ -60,7 +84,7 @@ function Warehouse(){
                     },
                     body: JSON.stringify({ 
                         name: name,
-                        address: address
+                        parentCategory: parentCategory ? parentCategory : null
                     })
                 })
                 .then((res) => res.json())
@@ -70,7 +94,7 @@ function Warehouse(){
                 })
             setModalVisible(false);
             setName('');
-            setAddress('');
+            setParentCategory('');
         }
         else{
             Cancel();
@@ -78,7 +102,7 @@ function Warehouse(){
     }
     //УДАЛЕНИЕ
     async function RemoveData(id){
-            await fetch(`/warehouse/delete/${id}`,
+            await fetch(`http://localhost:5000/category/delete/${id}`,
             {
                 method: "DELETE",
                 headers: {
@@ -88,9 +112,9 @@ function Warehouse(){
             .then((res) => res.json())
             .then((result) => 
             {
+                console.log(result);
                 if(result){
-                    const newData = data.filter(item => item.id !== id);
-                    setData(newData);
+                    GetAllData();
                 }
             }
             )
@@ -100,8 +124,8 @@ function Warehouse(){
     }
     //ОБНОВЛЕНИЕ
     async function UpdateData() {
-        if(name.length > 0 && address.length > 0){
-                await fetch(`/warehouse/update`,
+        if(name.length > 0){
+                await fetch(`http://localhost:5000/category/update`,
                 {
                     method: "PATCH",
                     headers: {
@@ -110,7 +134,7 @@ function Warehouse(){
                     body: JSON.stringify({ 
                         id: editId,
                         name: name,
-                        address: address
+                        parentCategory: parentCategory ? parentCategory : null
                     })
                 })
                 .then((res) => res.json())
@@ -119,8 +143,8 @@ function Warehouse(){
                     if(result){
                         const newData = [...data];
                         const index = newData.findIndex(item => item.id === editId);
-                        newData[index] = {id: editId, name: name, address: address};
-                        setData(newData);
+                        newData[index] = {id: editId, name: name, address: parentCategory};
+                        GetAllData();
                     }
                 }
                 )
@@ -130,7 +154,7 @@ function Warehouse(){
             setModalVisible(false);
             setEditId(null);
             setName('');
-            setAddress('');
+            setParentCategory('');
         } else {
             Cancel();
         }
@@ -138,14 +162,14 @@ function Warehouse(){
       function EditData(id){
         const item = data.find(item => item.id === id);
         setName(item.name);
-        setAddress(item.address);
+        setParentCategory(item.address);
         setEditId(item.id);
         setModalVisible(true);
     }
     function Cancel(){
         setModalVisible(false);
         setName('');
-        setAddress('');
+        setParentCategory('');
     }
     return (
         <div className={styles.content}>
@@ -154,7 +178,7 @@ function Warehouse(){
                 <div className={styles.modalBlock}>
                     <button className={styles.cancelBtn} onClick={Cancel}>X</button>
                     <input placeholder='Name...' value={name} onChange={(e) => setName(e.target.value)}></input>
-                    <input placeholder='Address...' value={address} onChange={(e) => setAddress(e.target.value)}></input>
+                    <input type={'number'} placeholder='Parent Category ID...' value={parentCategory} onChange={(e) => setParentCategory(e.target.value)}></input>
                     {!editId ? 
                     <button className={styles.modalAddBtn} onClick={AddData}>Add</button> :
                     <button className={styles.modalAddBtn} onClick={UpdateData}>Update</button>
@@ -171,17 +195,16 @@ function Warehouse(){
                                     <div key={item.id} className={styles.card}>
                                         <div className={styles.cardInfo}>
                                             <span className={styles.name}>{item.name}</span>
-                                            <span className={styles.address}>{item.address}</span>
+                                            {item.parentCategory ? <span className={styles.address}>{GetCategoryNameById(item.parentCategory) ? <span>Parent: {GetCategoryNameById(item.parentCategory)}</span> : <span className={styles.empty}></span>}</span> : <span className={styles.empty}></span>}
                                         </div>
                                         <button className={styles.removeBtn} onClick={() => RemoveData(item.id)}>Remove</button>
                                         <button className={styles.updateBtn} onClick={() => EditData(item.id)}>Update</button>
                                     </div>
                                 );
-                        })}         
-                        
+                        })}    
             </div>
         </div>
     );
 }
 
-export default Warehouse;
+export default Category;
