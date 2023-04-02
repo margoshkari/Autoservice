@@ -1,12 +1,37 @@
-import {useState} from 'react';
+import {useState, useEffect, useRef} from 'react';
 import styles from '../styles/WarehouseModule.module.css'
 
 function Warehouse(){
-    const [data, setData] = useState([{id: 1, name: "Sklad", address: "Address"}]);
+    const [data, setData] = useState([]);
     const [modalVisible, setModalVisible] = useState(false);
     const [name, setName] = useState('');
     const [address, setAddress] = useState('');
     const [editId, setEditId] = useState(null);
+    const isMountedRef = useRef(false);
+
+    useEffect(() => {
+        if (isMountedRef.current) {
+            return;
+        }
+        fetchData();
+        isMountedRef.current = true;
+    }, [])
+
+    async function fetchData(){
+        try {
+            await fetch("http://localhost:5000/warehouse",
+            {
+                method: "GET",
+                headers: {
+                    'Content-Type': 'application/json'
+                  },
+            })
+            .then((res) => res.json())
+            .then((data) => setData(data))
+        } catch (error) {
+            console.error(error);
+        }
+    }
 
     //УДАЛЕНИЕ
     function RemoveData(id){
