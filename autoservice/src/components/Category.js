@@ -24,7 +24,7 @@ function Category(){
     //ПОЛУЧЕНИЕ ВСЕХ КАТЕГОРИЙ
     async function GetAllData(){
         try {
-            await fetch("http://localhost:5000/category",
+            await fetch("/category",
             {
                 method: "GET",
                 headers: {
@@ -43,7 +43,7 @@ function Category(){
     //ПОЛУЧЕНИЕ КАТЕГОРИИ ПО ID
     async function GetById(id){
         try {
-            await fetch(`http://localhost:5000/category/${id}`,
+            await fetch(`/category/${id}`,
             {
                 method: "GET",
                 headers: {
@@ -101,7 +101,7 @@ function Category(){
     async function AddData(){
         console.log(parentCategory)
         if(name.length > 0 && parentCategory >= 0){
-                await fetch(`http://localhost:5000/category/create`,
+                await fetch(`/category/create`,
                 {
                     method: "POST",
                     headers: {
@@ -130,7 +130,7 @@ function Category(){
     }
     //УДАЛЕНИЕ
     async function RemoveData(id){
-            await fetch(`http://localhost:5000/category/delete/${id}`,
+            await fetch(`/category/delete/${id}`,
             {
                 method: "DELETE",
                 headers: {
@@ -153,7 +153,7 @@ function Category(){
     //ОБНОВЛЕНИЕ
     async function UpdateData() {
         if(name.length > 0){
-                await fetch(`http://localhost:5000/category/update`,
+                await fetch(`/category/update`,
                 {
                     method: "PATCH",
                     headers: {
