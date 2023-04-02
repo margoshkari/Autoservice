@@ -169,8 +169,10 @@ function Warehouse(){
                             data.map((item) => {
                                 return (
                                     <div key={item.id} className={styles.card}>
-                                        <h2>{item.name}</h2>
-                                        <h3>{item.address}</h3>
+                                        <div className={styles.cardInfo}>
+                                            <span className={styles.name}>{item.name}</span>
+                                            <span className={styles.address}>{item.address}</span>
+                                        </div>
                                         <button className={styles.removeBtn} onClick={() => RemoveData(item.id)}>Remove</button>
                                         <button className={styles.updateBtn} onClick={() => EditData(item.id)}>Update</button>
                                     </div>

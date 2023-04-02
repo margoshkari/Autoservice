@@ -1,44 +1,68 @@
 .content{
-    margin: 20px;
+    margin: 1%;
 }
 
-h2, h3{
-    margin: 3%;
+.name{
+    margin: 3% 0% 0% 0%;
+    font-size: 1.5rem;
+}
+.address{
+    margin: 0% 0% 10% 0%;
+    font-size: 1.2rem;
 }
 .cards{
     display: flex;
     flex-wrap: wrap;
 }
-
 .card{
+    min-width: 150px;
+    min-height: 150px;
+    margin: 1%;
     width: 10%;
-    border: 1px solid black;
-    border-radius: 5%;
+    height: 20vh;
+    border: 1px solid #2b2b2b;
     display: flex;
     flex-direction: column;
     justify-content: space-around;
 }
 
+.cardInfo{
+    display: flex;
+    flex-direction: column;
+    justify-content: space-around;
+    overflow: hidden;
+}
+
 .removeBtn{
-    background-color: rgb(247, 80, 80);
-    color: rgb(255, 255, 255);
+    background-color: #f79797;
+    color: rgb(0, 0, 0);
     border: 0;
-    width: 50%;
+    width: 60%;
+    height: 3vh;
+    min-height: 20px;
+    font-size: 1rem;
     align-self: center;
-    border-radius: 5%;
-    margin-bottom: 5%;
+    margin-bottom: 3%;
+    cursor: pointer;
+    border: 1px solid #2b2b2b;
+    overflow: hidden;
 }
 .updateBtn{
     background-color: rgb(199, 239, 255);
     color: rgb(0, 0, 0);
     border: 0;
-    width: 50%;
+    width: 60%;
+    height: 3vh;
+    min-height: 20px;
+    font-size: 1rem;
     align-self: center;
-    border-radius: 5%;
-    margin-bottom: 5%;
+    margin-bottom: 3%;
+    cursor: pointer;
+    border: 1px solid #2b2b2b;
+    overflow: hidden;
 }
 .removeBtn:hover{
-    background-color: rgb(179, 28, 28);
+    background-color: #fa8787;
 }
 .updateBtn:hover{
     background-color: rgb(182, 216, 230);
@@ -62,37 +86,48 @@ h2, h3{
     display: flex;
     flex-direction: column;
     align-items: center;
+    min-width: 250px;
+    min-height: 100px;
 }
 .cancelBtn{
     border: 0;
     background-color: rgb(255, 255, 255);
-    font-size: 1vw;
+    font-size: 1.3vw;
     align-self: flex-end;
     margin: 3% 5% 0 0;
+    cursor: pointer;
 }
 
 input{
     width: 50%;
     margin-top: 5%;
-    height: 7%;
+    height: 3vh;
     font-size: 1vw;
+    min-width: 100px;
+    min-height: 10px;
 }
 
 .modalAddBtn{
     border: 0;
     width: 20%;
-    height: 7%;
-    font-size: 0.9vw;
+    height: 3vh;
+    font-size: 1vw;
     align-self: center;
-    border-radius: 5%;
     margin: 5% 0 5% 0;
+    min-width: 100px;
+    min-height: 20px;
+    background-color: #ebe8e8;
+    cursor: pointer;
 }
 
 .addBtn{
     border: 0;
-    width: 10%;
-    height: 7%;
-    font-size: 0.9vw;
+    width: 7%;
+    height: 3vh;
+    font-size: 1vw;
     align-self: center;
-    border-radius: 5%;
+    background-color: #ebe8e8;
+    cursor: pointer;
+    min-width: 100px;
+    min-height: 20px;
 }
