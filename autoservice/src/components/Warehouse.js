@@ -13,12 +13,12 @@ function Warehouse(){
         if (isMountedRef.current) {
             return;
         }
-        fetchData();
+        GetAllData();
         isMountedRef.current = true;
     }, [])
 
     //ПОЛУЧЕНИЕ ВСЕХ СКЛАДОВ
-    async function fetchData(){
+    async function GetAllData(){
         try {
             await fetch("http://localhost:5000/warehouse",
             {
@@ -49,16 +49,27 @@ function Warehouse(){
             console.error(error);
         }
     }
-    //УДАЛЕНИЕ
-    function RemoveData(id){
-        const newData = data.filter(item => item.id !== id);
-        setData(newData);
-    }
     //ДОБАВЛЕНИЕ
-    function AddData(){
+    async function AddData(){
         if(name.length > 0 && address.length > 0){
-            const newData = {id: data.length + 1, name: name, address: address};
-            setData([...data, newData]);
+            try {
+                await fetch(`http://localhost:5000/warehouse/create`,
+                {
+                    method: "POST",
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({ 
+                        name: name,
+                        address: address
+                    })
+                })
+                .then((res) => res.json())
+                .then((data) => console.log(data))
+            } catch (error) {
+                console.error(error);
+            }
+            GetAllData();
             setModalVisible(false);
             setName('');
             setAddress('');
@@ -66,6 +77,11 @@ function Warehouse(){
         else{
             Cancel();
         }
+    }
+    //УДАЛЕНИЕ
+    function RemoveData(id){
+        const newData = data.filter(item => item.id !== id);
+        setData(newData);
     }
     //ОБНОВЛЕНИЕ
     function UpdateData() {
