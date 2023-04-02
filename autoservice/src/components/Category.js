@@ -79,11 +79,13 @@ function Category(){
     }
     //ФИЛЬТР ПО НАЗВАНИЮ
     function GetCategoryByName(){
+        const tmpData = initialData;
         if(searchName.length > 0){
-            const index = data.findIndex(item => item.name == name);
+            const index = tmpData.findIndex(item => item.name == searchName);
+            console.log(index)
             if(index !== -1){
                 console.log(data);
-                const newData = data.filter(item => item.id === data[index].id || Number(item.parentCategory) === data[index].id);
+                const newData = tmpData.filter(item => item.id === tmpData[index].id || Number(item.parentCategory) === tmpData[index].id);
                 setData(newData);
                 setSearchName('');
             }
