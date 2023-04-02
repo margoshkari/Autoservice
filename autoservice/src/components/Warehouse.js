@@ -20,7 +20,7 @@ function Warehouse(){
     //ПОЛУЧЕНИЕ ВСЕХ СКЛАДОВ
     async function GetAllData(){
         try {
-            await fetch("http://localhost:5000/warehouse",
+            await fetch("/warehouse",
             {
                 method: "GET",
                 headers: {
@@ -36,7 +36,7 @@ function Warehouse(){
     //ПОЛУЧЕНИЕ СКЛАДА ПО ID
     async function GetById(id){
         try {
-            await fetch(`http://localhost:5000/warehouse/${id}`,
+            await fetch(`/warehouse/${id}`,
             {
                 method: "GET",
                 headers: {
@@ -52,7 +52,7 @@ function Warehouse(){
     //ДОБАВЛЕНИЕ
     async function AddData(){
         if(name.length > 0 && address.length > 0){
-                await fetch(`http://localhost:5000/warehouse/create`,
+                await fetch(`/warehouse/create`,
                 {
                     method: "POST",
                     headers: {
@@ -78,7 +78,7 @@ function Warehouse(){
     }
     //УДАЛЕНИЕ
     async function RemoveData(id){
-            await fetch(`http://localhost:5000/warehouse/delete/${id}`,
+            await fetch(`/warehouse/delete/${id}`,
             {
                 method: "DELETE",
                 headers: {
@@ -101,7 +101,7 @@ function Warehouse(){
     //ОБНОВЛЕНИЕ
     async function UpdateData() {
         if(name.length > 0 && address.length > 0){
-                await fetch(`http://localhost:5000/warehouse/update`,
+                await fetch(`/warehouse/update`,
                 {
                     method: "PATCH",
                     headers: {
