@@ -84,12 +84,27 @@ function Warehouse(){
         setData(newData);
     }
     //ОБНОВЛЕНИЕ
-    function UpdateData() {
+    async function UpdateData() {
         if(name.length > 0 && address.length > 0){
-            const newData = [...data];
-            const index = newData.findIndex(item => item.id === editId);
-            newData[index] = {id: editId, name: name, address: address};
-            setData(newData);
+            try {
+                await fetch(`http://localhost:5000/warehouse/update`,
+                {
+                    method: "PATCH",
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({ 
+                        id: editId,
+                        name: name,
+                        address: address
+                    })
+                })
+                .then((res) => res.json())
+                .then((data) => console.log(data))
+            } catch (error) {
+                console.error(error);
+            }
+            GetAllData();
             setModalVisible(false);
             setEditId(null);
             setName('');
