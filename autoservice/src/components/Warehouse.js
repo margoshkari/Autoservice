@@ -17,6 +17,7 @@ function Warehouse(){
         isMountedRef.current = true;
     }, [])
 
+    //ПОЛУЧЕНИЕ ВСЕХ СКЛАДОВ
     async function fetchData(){
         try {
             await fetch("http://localhost:5000/warehouse",
@@ -32,7 +33,22 @@ function Warehouse(){
             console.error(error);
         }
     }
-
+    //ПОЛУЧЕНИЕ СКЛАДА ПО ID
+    async function GetById(id){
+        try {
+            await fetch(`http://localhost:5000/warehouse/${id}`,
+            {
+                method: "GET",
+                headers: {
+                    'Content-Type': 'application/json'
+                  },
+            })
+            .then((res) => res.json())
+            .then((data) => console.log(data))
+        } catch (error) {
+            console.error(error);
+        }
+    }
     //УДАЛЕНИЕ
     function RemoveData(id){
         const newData = data.filter(item => item.id !== id);
