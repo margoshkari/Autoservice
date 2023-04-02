@@ -52,7 +52,6 @@ function Warehouse(){
     //ДОБАВЛЕНИЕ
     async function AddData(){
         if(name.length > 0 && address.length > 0){
-            try {
                 await fetch(`http://localhost:5000/warehouse/create`,
                 {
                     method: "POST",
@@ -65,11 +64,10 @@ function Warehouse(){
                     })
                 })
                 .then((res) => res.json())
-                .then((data) => console.log(data))
-            } catch (error) {
-                console.error(error);
-            }
-            GetAllData();
+                .then((newData) => setData([...data, newData]))
+                .catch(error => {
+                    console.log(error)
+                })
             setModalVisible(false);
             setName('');
             setAddress('');
@@ -91,7 +89,6 @@ function Warehouse(){
             .then((result) => 
             {
                 if(result){
-                    console.log(result);
                     const newData = data.filter(item => item.id !== id);
                     setData(newData);
                 }
@@ -120,7 +117,6 @@ function Warehouse(){
                 .then((result) => 
                 {
                     if(result){
-                        console.log(result);
                         const newData = [...data];
                         const index = newData.findIndex(item => item.id === editId);
                         newData[index] = {id: editId, name: name, address: address};
