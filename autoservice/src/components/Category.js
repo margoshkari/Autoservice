@@ -3,10 +3,12 @@ import styles from '../styles/CardsModule.module.css'
 
 
 function Category(){
+    const [initialData, setInitialData] = useState([]);
     const [data, setData] = useState([]);
     const [category, setCategory] = useState({});
     const [modalVisible, setModalVisible] = useState(false);
     const [name, setName] = useState('');
+    const [searchName, setSearchName] = useState('');
     const [parentCategory, setParentCategory] = useState(0);
     const [editId, setEditId] = useState(null);
     const isMountedRef = useRef(false);
@@ -30,7 +32,10 @@ function Category(){
                 },
             })
             .then((res) => res.json())
-            .then((data) => setData(data))
+            .then((data) => {
+                setData(data);
+                setInitialData(data);
+            })
         } catch (error) {
             console.error(error);
         }
@@ -72,6 +77,24 @@ function Category(){
             console.error(error);
         }
     }
+    //ФИЛЬТР ПО НАЗВАНИЮ
+    function GetCategoryByName(){
+        if(searchName.length > 0){
+            const index = data.findIndex(item => item.name == name);
+            if(index !== -1){
+                console.log(data);
+                const newData = data.filter(item => item.id === data[index].id || Number(item.parentCategory) === data[index].id);
+                setData(newData);
+                setSearchName('');
+            }
+            else{
+                setData(null);
+            }
+        }
+        else{
+            setData(initialData);
+        }
+    }
     //ДОБАВЛЕНИЕ
     async function AddData(){
         console.log(parentCategory)
@@ -88,7 +111,10 @@ function Category(){
                     })
                 })
                 .then((res) => res.json())
-                .then((newData) => setData([...data, newData]))
+                .then((newData) => {
+                    setData([...data, newData]);
+                    setInitialData([...initialData, newData]);
+                })
                 .catch(error => {
                     console.log(error)
                 })
@@ -187,9 +213,13 @@ function Category(){
                 </div>
             </div>
             )}
+            <div>
+                <input className={styles.search} placeholder='Name...' value={searchName} onChange={(e) => setSearchName(e.target.value)}></input>
+            <button className={styles.addBtn} onClick={GetCategoryByName}>Search</button>
+            </div>
             <button className={styles.addBtn} onClick={() => setModalVisible(true)}>Add Data</button>
             <div className={styles.cards}>
-                        {!data ? (<div>No warehouse found</div>) : 
+                        {!data ? (<span style={{fontSize: "2rem", margin:"5%"}}>No category found</span>) : 
                             data.map((item) => {
                                 return (
                                     <div key={item.id} className={styles.card}>

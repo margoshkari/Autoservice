@@ -165,7 +165,7 @@ function Warehouse(){
             )}
             <button className={styles.addBtn} onClick={() => setModalVisible(true)}>Add Data</button>
             <div className={styles.cards}>
-                        {!data ? (<div>No warehouse found</div>) : 
+                        {!data ? (<span style={{fontSize: "2rem", margin:"5%"}}>No warehouse found</span>) : 
                             data.map((item) => {
                                 return (
                                     <div key={item.id} className={styles.card}>

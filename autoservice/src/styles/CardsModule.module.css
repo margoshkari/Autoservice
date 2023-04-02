@@ -17,6 +17,7 @@
 .cards{
     display: flex;
     flex-wrap: wrap;
+    justify-content: center;
 }
 .card{
     min-width: 150px;
@@ -109,6 +110,13 @@ input{
     font-size: 1vw;
     min-width: 100px;
     min-height: 10px;
+}
+input:focus {
+    outline: none;
+  }
+.search{
+    width: 20%;
+    margin: 0% 3% 1% 0%;
 }
 
 .modalAddBtn{
