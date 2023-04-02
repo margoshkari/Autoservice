@@ -79,14 +79,31 @@ function Warehouse(){
         }
     }
     //УДАЛЕНИЕ
-    function RemoveData(id){
-        const newData = data.filter(item => item.id !== id);
-        setData(newData);
+    async function RemoveData(id){
+            await fetch(`http://localhost:5000/warehouse/delete/${id}`,
+            {
+                method: "DELETE",
+                headers: {
+                    'Content-Type': 'application/json'
+                  },
+            })
+            .then((res) => res.json())
+            .then((result) => 
+            {
+                if(result){
+                    console.log(result);
+                    const newData = data.filter(item => item.id !== id);
+                    setData(newData);
+                }
+            }
+            )
+            .catch(error => {
+                console.log(error)
+            })
     }
     //ОБНОВЛЕНИЕ
     async function UpdateData() {
         if(name.length > 0 && address.length > 0){
-            try {
                 await fetch(`http://localhost:5000/warehouse/update`,
                 {
                     method: "PATCH",
@@ -100,11 +117,20 @@ function Warehouse(){
                     })
                 })
                 .then((res) => res.json())
-                .then((data) => console.log(data))
-            } catch (error) {
-                console.error(error);
-            }
-            GetAllData();
+                .then((result) => 
+                {
+                    if(result){
+                        console.log(result);
+                        const newData = [...data];
+                        const index = newData.findIndex(item => item.id === editId);
+                        newData[index] = {id: editId, name: name, address: address};
+                        setData(newData);
+                    }
+                }
+                )
+                .catch(error => {
+                    console.log(error)
+                })
             setModalVisible(false);
             setEditId(null);
             setName('');
