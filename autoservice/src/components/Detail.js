@@ -24,7 +24,7 @@ function Detail(){
     //ПОЛУЧЕНИЕ ВСЕХ ДЕТАЛЕЙ
     async function GetAllData(){
         try {
-            await fetch("http://localhost:5000/detail",
+            await fetch("/detail",
             {
                 method: "GET",
                 headers: {
@@ -41,7 +41,7 @@ function Detail(){
     }
     //ДОБАВЛЕНИЕ
     async function AddData(){
-        await fetch('http://localhost:5000/detail/create', {
+        await fetch('/detail/create', {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json'
@@ -67,7 +67,7 @@ function Detail(){
     };
     //ОБНОВЛЕНИЕ
     async function UpdateData() {
-        await fetch(`http://localhost:5000/detail/update`,
+        await fetch(`/detail/update`,
         {
             method: "PATCH",
             headers: {
@@ -125,7 +125,7 @@ function Detail(){
     }
     //УДАЛЕНИЕ
     async function RemoveData(id){
-        await fetch(`http://localhost:5000/detail/delete/${id}`,
+        await fetch(`/detail/delete/${id}`,
             {
                 method: "DELETE",
                 headers: {
@@ -171,7 +171,7 @@ function Detail(){
             </div>
             <button className={styles.addBtn} onClick={() => setModalVisible(true)}>Add Data</button>
             <div className={styles.cards}>
-                        {!data ? (<span style={{fontSize: "2rem", margin:"5%"}}>No category found</span>) : 
+                        {!data ? (<span style={{fontSize: "2rem", margin:"5%"}}>No detail found</span>) : 
                             data.filter((item) => item.model.toLowerCase().includes(filterModel.toLowerCase())).map((item) => {
                                 return (
                                     <div key={item.id} className={styles.card} style={{height: "30vh"}}>

@@ -3,7 +3,6 @@ import styles from '../styles/CardsModule.module.css'
 
 
 function Category(){
-    const [initialData, setInitialData] = useState([]);
     const [data, setData] = useState([]);
     const [category, setCategory] = useState({});
     const [modalVisible, setModalVisible] = useState(false);
@@ -34,7 +33,6 @@ function Category(){
             .then((res) => res.json())
             .then((data) => {
                 setData(data);
-                setInitialData(data);
             })
         } catch (error) {
             console.error(error);
@@ -77,26 +75,6 @@ function Category(){
             console.error(error);
         }
     }
-    //ФИЛЬТР ПО НАЗВАНИЮ
-    function GetCategoryByName(){
-        const tmpData = initialData;
-        if(searchName.length > 0){
-            const index = tmpData.findIndex(item => item.name == searchName);
-            console.log(index)
-            if(index !== -1){
-                console.log(data);
-                const newData = tmpData.filter(item => item.id === tmpData[index].id || Number(item.parentCategory) === tmpData[index].id);
-                setData(newData);
-                setSearchName('');
-            }
-            else{
-                setData(null);
-            }
-        }
-        else{
-            setData(initialData);
-        }
-    }
     //ДОБАВЛЕНИЕ
     async function AddData(){
         console.log(parentCategory)
@@ -115,7 +93,6 @@ function Category(){
                 .then((res) => res.json())
                 .then((newData) => {
                     setData([...data, newData]);
-                    setInitialData([...initialData, newData]);
                 })
                 .catch(error => {
                     console.log(error)
@@ -217,12 +194,11 @@ function Category(){
             )}
             <div>
                 <input className={styles.search} placeholder='Name...' value={searchName} onChange={(e) => setSearchName(e.target.value)}></input>
-            <button className={styles.addBtn} onClick={GetCategoryByName}>Search</button>
             </div>
             <button className={styles.addBtn} onClick={() => setModalVisible(true)}>Add Data</button>
             <div className={styles.cards}>
                         {!data ? (<span style={{fontSize: "2rem", margin:"5%"}}>No category found</span>) : 
-                            data.map((item) => {
+                            data.filter((item) => item.name.toLowerCase().includes(searchName.toLowerCase())).map((item) => {
                                 return (
                                     <div key={item.id} className={styles.card}>
                                         <div className={styles.cardInfo}>
