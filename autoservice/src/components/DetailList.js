@@ -21,7 +21,7 @@ function DetailList(){
     //ПОЛУЧЕНИЕ ВСЕХ СПИСКОВ
     async function GetAllData(){
         
-            await fetch("http://localhost:5000/detailList",
+            await fetch("/detailList",
             {
                 method: "GET",
                 headers: {
@@ -37,7 +37,7 @@ function DetailList(){
     }
     //ДОБАВЛЕНИЕ
     async function AddData(){
-        await fetch('http://localhost:5000/detailList/create', {
+        await fetch('/detailList/create', {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json'
@@ -59,7 +59,7 @@ function DetailList(){
     };
      //ОБНОВЛЕНИЕ
      async function UpdateData() {
-        await fetch(`http://localhost:5000/detailList/update`,
+        await fetch(`/detailList/update`,
         {
             method: "PATCH",
             headers: {
@@ -109,7 +109,7 @@ function DetailList(){
     }
     //УДАЛЕНИЕ
     async function RemoveData(id){
-        await fetch(`http://localhost:5000/detailList/delete/${id}`,
+        await fetch(`/detailList/delete/${id}`,
             {
                 method: "DELETE",
                 headers: {

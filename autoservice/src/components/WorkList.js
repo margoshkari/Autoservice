@@ -1,13 +1,15 @@
 import {useState, useEffect, useRef} from 'react';
 import styles from '../styles/CardsModule.module.css'
 
-function Warehouse(){
+function WorkList(){
+    const [filterName, setFilterName] = useState('');
     const [data, setData] = useState([]);
     const [modalVisible, setModalVisible] = useState(false);
     const [name, setName] = useState('');
-    const [address, setAddress] = useState('');
+    const [description, setDescription] = useState('');
+    const [price, setPrice] = useState(0);
+    const [duration, setDuration] = useState(0);
     const [editId, setEditId] = useState(null);
-    const [filterName, setFilterName] = useState('');
     const isMountedRef = useRef(false);
 
     useEffect(() => {
@@ -18,65 +20,50 @@ function Warehouse(){
         isMountedRef.current = true;
     }, [])
 
-    //ПОЛУЧЕНИЕ ВСЕХ СКЛАДОВ
+    //ПОЛУЧЕНИЕ ВСЕХ УСЛУГ
     async function GetAllData(){
-        await fetch("/warehouse",
+        
+            await fetch("/worklist",
             {
                 method: "GET",
                 headers: {
                     'Content-Type': 'application/json'
-                  },
+                },
             })
             .then((res) => res.json())
-            .then((data) => setData(data))
+            .then((data) => {
+                setData(data);
+            })
             .catch ((error)=> {
-            console.error(error)});
-    }
-    //ПОЛУЧЕНИЕ СКЛАДА ПО ID
-    async function GetById(id){
-        await fetch(`/warehouse/${id}`,
-        {
-            method: "GET",
-            headers: {
-                'Content-Type': 'application/json'
-              },
-        })
-        .then((res) => res.json())
-        .then((data) => console.log(data))
-        .catch ((error)=> {
-            console.error(error)});
-            
+                console.error(error)});
     }
     //ДОБАВЛЕНИЕ
     async function AddData(){
-        if(name.length > 0 && address.length > 0){
-                await fetch(`/warehouse/create`,
-                {
-                    method: "POST",
-                    headers: {
-                        'Content-Type': 'application/json'
-                    },
-                    body: JSON.stringify({ 
-                        name: name,
-                        address: address
-                    })
-                })
-                .then((res) => res.json())
-                .then((newData) => setData([...data, newData]))
-                .catch(error => {
-                    console.log(error)
-                })
-            setModalVisible(false);
-            setName('');
-            setAddress('');
-        }
-        else{
-            Cancel();
-        }
-    }
+        await fetch('/worklist/create', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({
+                name: name,
+                description: description,
+                price: Number(price),
+                duration: Number(duration)
+            })
+        })
+        .then((res) => res.json())
+        .then((result) => {
+            setData([...data, result]);
+        });
+        setModalVisible(false);
+        setName('');
+        setDescription('');
+        setPrice(0);
+        setDuration(0);
+    };
     //УДАЛЕНИЕ
     async function RemoveData(id){
-            await fetch(`/warehouse/delete/${id}`,
+        await fetch(`/worklist/delete/${id}`,
             {
                 method: "DELETE",
                 headers: {
@@ -86,6 +73,7 @@ function Warehouse(){
             .then((res) => res.json())
             .then((result) => 
             {
+                console.log(result);
                 if(result){
                     const newData = data.filter(item => item.id !== id);
                     setData(newData);
@@ -98,61 +86,68 @@ function Warehouse(){
     }
     //ОБНОВЛЕНИЕ
     async function UpdateData() {
-        if(name.length > 0 && address.length > 0){
-                await fetch(`/warehouse/update`,
-                {
-                    method: "PATCH",
-                    headers: {
-                        'Content-Type': 'application/json'
-                    },
-                    body: JSON.stringify({ 
-                        id: editId,
-                        name: name,
-                        address: address
-                    })
-                })
-                .then((res) => res.json())
-                .then((result) => 
-                {
-                    if(result){
-                        const newData = [...data];
-                        const index = newData.findIndex(item => item.id === editId);
-                        newData[index] = {id: editId, name: name, address: address};
-                        setData(newData);
-                    }
-                }
-                )
-                .catch(error => {
-                    console.log(error)
-                })
-            setModalVisible(false);
-            setEditId(null);
-            setName('');
-            setAddress('');
-        } else {
-            Cancel();
+        await fetch(`/detail/update`,
+        {
+            method: "PATCH",
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({ 
+                id: Number(editId),
+                name: name,
+                description: description,
+                price: Number(price),
+                cduration: Number(duration)
+            })
+        })
+        .then((res) => res.json())
+        .then((result) => 
+        {
+            if(result){
+                const newData = [...data];
+                const index = newData.findIndex(item => item.id === editId);
+                newData[index] = {id: editId, name: name, description: description, price: Number(price), duration: Number(duration)};
+                setData(newData);
+            }
         }
+        )
+        .catch(error => {
+            console.log(error)
+        })
+        setModalVisible(false);
+        setEditId(null);
+        setName('');
+        setDescription('');
+        setPrice(0);
+        setDuration(0);
+                
       }
       function EditData(id){
         const item = data.find(item => item.id === id);
-        setName(item.name);
-        setAddress(item.address);
-        setEditId(item.id);
         setModalVisible(true);
+        setEditId(item.id);
+        setName(item.name);
+        setDescription(item.description);
+        setPrice(item.price);
+        setDuration(item.duration);
     }
     function Cancel(){
         setModalVisible(false);
         setName('');
-        setAddress('');
+        setDescription('');
+        setPrice(0);
+        setDuration(0);
     }
-    return (
+    return(
         <div className={styles.content}>
             {modalVisible && (
             <div className={styles.modal}>
                 <div className={styles.modalBlock}>
                     <button className={styles.cancelBtn} onClick={Cancel}>X</button>
                     <input placeholder='Name...' value={name} onChange={(e) => setName(e.target.value)}></input>
-                    <input placeholder='Address...' value={address} onChange={(e) => setAddress(e.target.value)}></input>
+                    <input placeholder='Description...' value={description} onChange={(e) => setDescription(e.target.value)}></input>
+                    <input type={'number'} placeholder='Price...' value={price} onChange={(e) => setPrice(e.target.value)}></input>
+                    <input type={'number'} placeholder='Duration...' value={duration} onChange={(e) => setDuration(e.target.value)}></input>
                     {!editId ? 
                     <button className={styles.modalAddBtn} onClick={AddData}>Add</button> :
                     <button className={styles.modalAddBtn} onClick={UpdateData}>Update</button>
@@ -161,28 +156,29 @@ function Warehouse(){
                 </div>
             </div>
             )}
-             <div>
+            <div>
                 <input className={styles.search} placeholder='Name...' value={filterName} onChange={(e) => setFilterName(e.target.value)}></input>
             </div>
             <button className={styles.addBtn} onClick={() => setModalVisible(true)}>Add Data</button>
             <div className={styles.cards}>
-                        {!data ? (<span style={{fontSize: "2rem", margin:"5%"}}>No warehouse found</span>) : 
+                        {!data ? (<span style={{fontSize: "2rem", margin:"5%"}}>No detail found</span>) : 
                             data.filter((item) => item.name.toLowerCase().includes(filterName.toLowerCase())).map((item) => {
                                 return (
-                                    <div key={item.id} className={styles.card}>
+                                    <div key={item.id} className={styles.card} style={{height: "25vh"}}>
                                         <div className={styles.cardInfo}>
                                             <span className={styles.name}>{item.name}</span>
-                                            <span className={styles.address}>{item.address}</span>
+                                            <span className={styles.address}>{item.description}</span>
+                                            <span className={styles.address}>{item.price}</span>
+                                            <span className={styles.address}>{item.duration}</span>
                                         </div>
                                         <button className={styles.removeBtn} onClick={() => RemoveData(item.id)}>Remove</button>
                                         <button className={styles.updateBtn} onClick={() => EditData(item.id)}>Update</button>
                                     </div>
                                 );
-                        })}         
-                        
+                        })}    
             </div>
         </div>
     );
 }
 
-export default Warehouse;
+export default WorkList;
