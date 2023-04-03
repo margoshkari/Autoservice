@@ -19,8 +19,7 @@ function Warehouse(){
 
     //ПОЛУЧЕНИЕ ВСЕХ СКЛАДОВ
     async function GetAllData(){
-        try {
-            await fetch("/warehouse",
+        await fetch("/warehouse",
             {
                 method: "GET",
                 headers: {
@@ -29,25 +28,23 @@ function Warehouse(){
             })
             .then((res) => res.json())
             .then((data) => setData(data))
-        } catch (error) {
-            console.error(error);
-        }
+            .catch ((error)=> {
+            console.error(error)});
     }
     //ПОЛУЧЕНИЕ СКЛАДА ПО ID
     async function GetById(id){
-        try {
-            await fetch(`/warehouse/${id}`,
-            {
-                method: "GET",
-                headers: {
-                    'Content-Type': 'application/json'
-                  },
-            })
-            .then((res) => res.json())
-            .then((data) => console.log(data))
-        } catch (error) {
-            console.error(error);
-        }
+        await fetch(`/warehouse/${id}`,
+        {
+            method: "GET",
+            headers: {
+                'Content-Type': 'application/json'
+              },
+        })
+        .then((res) => res.json())
+        .then((data) => console.log(data))
+        .catch ((error)=> {
+            console.error(error)});
+            
     }
     //ДОБАВЛЕНИЕ
     async function AddData(){

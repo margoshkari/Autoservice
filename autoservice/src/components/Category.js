@@ -22,8 +22,8 @@ function Category(){
 
     //ПОЛУЧЕНИЕ ВСЕХ КАТЕГОРИЙ
     async function GetAllData(){
-        try {
-            await fetch("/category",
+        
+            await fetch("http://localhost:5000/category",
             {
                 method: "GET",
                 headers: {
@@ -34,13 +34,12 @@ function Category(){
             .then((data) => {
                 setData(data);
             })
-        } catch (error) {
-            console.error(error);
-        }
+            .catch ((error)=> {
+                console.error(error)});
     }
     //ПОЛУЧЕНИЕ КАТЕГОРИИ ПО ID
     async function GetById(id){
-        try {
+        
             await fetch(`/category/${id}`,
             {
                 method: "GET",
@@ -50,9 +49,8 @@ function Category(){
             })
             .then((res) => res.json())
             .then((data) => setCategory(data))
-        } catch (error) {
-            console.error(error);
-        }
+            .catch ((error)=> {
+                console.error(error)});
     }
     //ПОЛУЧЕНИЕ НАЗВАНИЯ РОДИТЕЛЬСКОЙ КАТЕГОРИИ
     function GetCategoryNameById(id){
@@ -61,7 +59,7 @@ function Category(){
     }
     //ФИЛЬТР КАТЕГОРИЙ ПО РОДИТЕЛЬСКОМУ ID
     async function GetByParentId(id){
-        try {
+        
             await fetch(`/category?parentId=${id}`,
             {
                 method: "GET",
@@ -71,15 +69,13 @@ function Category(){
             })
             .then((res) => res.json())
             .then((data) => setData(data))
-        } catch (error) {
-            console.error(error);
-        }
+            .catch ((error)=> {
+                console.error(error)});
     }
     //ДОБАВЛЕНИЕ
     async function AddData(){
-        console.log(parentCategory)
         if(name.length > 0 && parentCategory >= 0){
-                await fetch(`/category/create`,
+                await fetch(`http://localhost:5000/category/create`,
                 {
                     method: "POST",
                     headers: {
@@ -87,7 +83,7 @@ function Category(){
                     },
                     body: JSON.stringify({ 
                         name: name,
-                        parentCategory: parentCategory ? parentCategory : null
+                        parentCategory: parentCategory ? Number(parentCategory) : null
                     })
                 })
                 .then((res) => res.json())
@@ -107,7 +103,7 @@ function Category(){
     }
     //УДАЛЕНИЕ
     async function RemoveData(id){
-            await fetch(`/category/delete/${id}`,
+            await fetch(`http://localhost:5000/category/delete/${id}`,
             {
                 method: "DELETE",
                 headers: {
@@ -117,9 +113,8 @@ function Category(){
             .then((res) => res.json())
             .then((result) => 
             {
-                console.log(result);
                 if(result){
-                    GetAllData();
+                    setData(removeChildren(data, id));
                 }
             }
             )
@@ -127,6 +122,14 @@ function Category(){
                 console.log(error)
             })
     }
+    const removeChildren = (data, parentId) => {
+        const children = data.filter(item => item.parentCategory === parentId);
+        children.forEach(item => {
+            removeChildren(data, item.id);
+        });
+        const newData = data.filter(item => item.id !== parentId && !children.includes(item));
+        return newData;
+      };
     //ОБНОВЛЕНИЕ
     async function UpdateData() {
         if(name.length > 0){
@@ -159,7 +162,7 @@ function Category(){
             setModalVisible(false);
             setEditId(null);
             setName('');
-            setParentCategory('');
+            setParentCategory(null);
         } else {
             Cancel();
         }

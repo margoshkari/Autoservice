@@ -20,7 +20,7 @@ function DetailList(){
 
     //ПОЛУЧЕНИЕ ВСЕХ СПИСКОВ
     async function GetAllData(){
-        try {
+        
             await fetch("http://localhost:5000/detailList",
             {
                 method: "GET",
@@ -32,9 +32,8 @@ function DetailList(){
             .then((data) => {
                 setData(data);
             })
-        } catch (error) {
-            console.error(error);
-        }
+            .catch ((error)=> {
+                console.error(error)});
     }
     //ДОБАВЛЕНИЕ
     async function AddData(){

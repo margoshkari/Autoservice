@@ -23,7 +23,7 @@ function Detail(){
 
     //ПОЛУЧЕНИЕ ВСЕХ ДЕТАЛЕЙ
     async function GetAllData(){
-        try {
+        
             await fetch("/detail",
             {
                 method: "GET",
@@ -35,9 +35,8 @@ function Detail(){
             .then((data) => {
                 setData(data);
             })
-        } catch (error) {
-            console.error(error);
-        }
+            .catch ((error)=> {
+                console.error(error)});
     }
     //ДОБАВЛЕНИЕ
     async function AddData(){

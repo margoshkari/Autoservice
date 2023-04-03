@@ -7,7 +7,7 @@ import DetailList from './components/DetailList';
 function App() {
   return (
     <div className="App">
-     <DetailList/>
+     <Category/>
     </div>
   );
 }
