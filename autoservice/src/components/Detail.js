@@ -1,5 +1,6 @@
 import {useState, useEffect, useRef} from 'react';
 import styles from '../styles/CardsModule.module.css'
+import {getAllData, addData, removeData, updateData} from '../modules/requests';
 
 function Detail(){
     const [filterModel, setFilterModel] = useState('');
@@ -23,40 +24,19 @@ function Detail(){
 
     //ПОЛУЧЕНИЕ ВСЕХ ДЕТАЛЕЙ
     async function GetAllData(){
-        
-            await fetch("/detail",
-            {
-                method: "GET",
-                headers: {
-                    'Content-Type': 'application/json'
-                },
-            })
-            .then((res) => res.json())
-            .then((data) => {
-                setData(data);
-            })
-            .catch ((error)=> {
-                console.error(error)});
+        const result = await getAllData("http://localhost:5000/detail");
+        setData(result);
     }
     //ДОБАВЛЕНИЕ
     async function AddData(){
-        await fetch('/detail/create', {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json'
-            },
-            body: JSON.stringify({
-                model: model,
-                vendorCode: vendorCode,
-                description: description,
-                compatibleVehicles: compatibleVehicles,
-                catId: Number(catId)
-            })
-        })
-        .then((res) => res.json())
-        .then((result) => {
+        const result = await addData("http://localhost:5000/detail/create", {
+            model: model,
+            vendorCode: vendorCode,
+            description: description,
+            compatibleVehicles: compatibleVehicles,
+            catId: Number(catId)
+            });
             setData([...data, result]);
-        });
         setModalVisible(false);
         setModel('');
         setVendorCode('');
@@ -64,37 +44,30 @@ function Detail(){
         setCompatibleVehicles('');
         setCatId(0);
     };
+    //УДАЛЕНИЕ
+    async function RemoveData(id){
+        const result = await removeData(`http://localhost:5000/detail/delete/${id}`);
+        if(result){
+            const newData = data.filter(item => item.id !== id);
+            setData(newData);
+        }
+    }
     //ОБНОВЛЕНИЕ
     async function UpdateData() {
-        await fetch(`/detail/update`,
-        {
-            method: "PATCH",
-            headers: {
-                'Content-Type': 'application/json'
-            },
-            body: JSON.stringify({ 
-                id: Number(editId),
-                model: model,
-                vendorCode: vendorCode,
-                description: description,
-                compatibleVehicles: compatibleVehicles,
-                catId: Number(catId)
-            })
-        })
-        .then((res) => res.json())
-        .then((result) => 
-        {
+        const result = await updateData("http://localhost:5000/detail/update", {
+            id: Number(editId),
+            model: model,
+            vendorCode: vendorCode,
+            description: description,
+            compatibleVehicles: compatibleVehicles,
+            catId: Number(catId)
+            });
             if(result){
                 const newData = [...data];
                 const index = newData.findIndex(item => item.id === editId);
                 newData[index] = {id: editId, model: model, vendorCode: vendorCode, description: description, compatibleVehicles: compatibleVehicles, catId: Number(catId)};
                 setData(newData);
             }
-        }
-        )
-        .catch(error => {
-            console.log(error)
-        })
         setModalVisible(false);
         setEditId(null);
         setModel('');
@@ -122,30 +95,7 @@ function Detail(){
         setCompatibleVehicles('');
         setCatId(0);
     }
-    //УДАЛЕНИЕ
-    async function RemoveData(id){
-        await fetch(`/detail/delete/${id}`,
-            {
-                method: "DELETE",
-                headers: {
-                    'Content-Type': 'application/json'
-                  },
-            })
-            .then((res) => res.json())
-            .then((result) => 
-            {
-                console.log(result);
-                if(result){
-                    const newData = data.filter(item => item.id !== id);
-                    setData(newData);
-                }
-            }
-            )
-            .catch(error => {
-                console.log(error)
-            })
-    }
-
+    
     return(
         <div className={styles.content}>
             {modalVisible && (
