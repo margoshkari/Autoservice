@@ -1,5 +1,5 @@
 //ПОЛУЧЕНИЕ ДАННЫХ
-async function GetAllData(url){
+async function getAllData(url){
     try {
         const response = await fetch(url, {
           method: 'GET',
@@ -15,7 +15,7 @@ async function GetAllData(url){
       }
 }
 //ДОБАВЛЕНИЕ
-async function AddData(url, object){
+async function addData(url, object){
     try {
         const response = await fetch(url,
             {
@@ -33,7 +33,7 @@ async function AddData(url, object){
     }       
 }
 //УДАЛЕНИЕ
-async function RemoveData(url){
+async function removeData(url){
     try {
         const response = await fetch(url,
             {
@@ -50,7 +50,7 @@ async function RemoveData(url){
     } 
 }
 //ОБНОВЛЕНИЕ
-async function UpdateData(url, object) {
+async function updateData(url, object) {
     try {
         const response = await fetch(url,
             {
@@ -68,8 +68,8 @@ async function UpdateData(url, object) {
     }     
   }
 export {
-    GetAllData,
-    AddData,
-    RemoveData,
-    UpdateData
+    getAllData,
+    addData,
+    removeData,
+    updateData
   };

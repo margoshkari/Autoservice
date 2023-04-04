@@ -1,5 +1,6 @@
 import {useState, useEffect, useRef} from 'react';
 import styles from '../styles/CardsModule.module.css'
+import {getAllData, addData, removeData, updateData} from '../modules/requests';
 
 
 function Category(){
@@ -22,20 +23,8 @@ function Category(){
 
     //ПОЛУЧЕНИЕ ВСЕХ КАТЕГОРИЙ
     async function GetAllData(){
-        
-            await fetch("http://localhost:5000/category",
-            {
-                method: "GET",
-                headers: {
-                    'Content-Type': 'application/json'
-                },
-            })
-            .then((res) => res.json())
-            .then((data) => {
-                setData(data);
-            })
-            .catch ((error)=> {
-                console.error(error)});
+        const result = await getAllData("http://localhost:5000/category");
+        setData(result);
     }
     //ПОЛУЧЕНИЕ КАТЕГОРИИ ПО ID
     async function GetById(id){
@@ -75,24 +64,11 @@ function Category(){
     //ДОБАВЛЕНИЕ
     async function AddData(){
         if(name.length > 0 && parentCategory >= 0){
-                await fetch(`http://localhost:5000/category/create`,
-                {
-                    method: "POST",
-                    headers: {
-                        'Content-Type': 'application/json'
-                    },
-                    body: JSON.stringify({ 
-                        name: name,
-                        parentCategory: parentCategory ? Number(parentCategory) : null
-                    })
-                })
-                .then((res) => res.json())
-                .then((newData) => {
-                    setData([...data, newData]);
-                })
-                .catch(error => {
-                    console.log(error)
-                })
+            const result = await addData("http://localhost:5000/category/create", {
+                name: name, 
+                parentCategory: parentCategory ? Number(parentCategory) : null
+            });
+            setData([...data, result])
             setModalVisible(false);
             setName('');
             setParentCategory('');
@@ -103,24 +79,10 @@ function Category(){
     }
     //УДАЛЕНИЕ
     async function RemoveData(id){
-            await fetch(`http://localhost:5000/category/delete/${id}`,
-            {
-                method: "DELETE",
-                headers: {
-                    'Content-Type': 'application/json'
-                  },
-            })
-            .then((res) => res.json())
-            .then((result) => 
-            {
-                if(result){
-                    setData(removeChildren(data, id));
-                }
-            }
-            )
-            .catch(error => {
-                console.log(error)
-            })
+        const result = await removeData(`http://localhost:5000/category/delete/${id}`);
+        if(result){
+            setData(removeChildren(data, id));
+        }
     }
     const removeChildren = (data, parentId) => {
         const children = data.filter(item => item.parentCategory === parentId);
@@ -133,39 +95,25 @@ function Category(){
     //ОБНОВЛЕНИЕ
     async function UpdateData() {
         if(name.length > 0){
-                await fetch(`/category/update`,
-                {
-                    method: "PATCH",
-                    headers: {
-                        'Content-Type': 'application/json'
-                    },
-                    body: JSON.stringify({ 
-                        id: editId,
-                        name: name,
-                        parentCategory: parentCategory ? parentCategory : null
-                    })
-                })
-                .then((res) => res.json())
-                .then((result) => 
-                {
-                    if(result){
-                        const newData = [...data];
-                        const index = newData.findIndex(item => item.id === editId);
-                        newData[index] = {id: editId, name: name, address: parentCategory};
-                        GetAllData();
-                    }
-                }
-                )
-                .catch(error => {
-                    console.log(error)
-                })
-            setModalVisible(false);
-            setEditId(null);
-            setName('');
-            setParentCategory(null);
-        } else {
+            const result = await updateData("http://localhost:5000/category/update", {
+                id: editId,
+                name: name, 
+                parentCategory: parentCategory ? Number(parentCategory) : null
+            });
+            if(result){
+                const newData = [...data];
+                const index = newData.findIndex(item => item.id === editId);
+                newData[index] = {id: editId, name: name, address: parentCategory};
+                GetAllData();
+            }
+        }
+        else{
             Cancel();
         }
+        setModalVisible(false);
+        setEditId(null);
+        setName('');
+        setParentCategory(null);    
       }
       function EditData(id){
         const item = data.find(item => item.id === id);

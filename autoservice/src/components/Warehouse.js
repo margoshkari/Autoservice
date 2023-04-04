@@ -1,6 +1,6 @@
 import {useState, useEffect, useRef} from 'react';
 import styles from '../styles/CardsModule.module.css'
-import {GetAllData, AddData, RemoveData, UpdateData} from '../modules/requests';
+import {getAllData, addData, removeData, updateData} from '../modules/requests';
 
 function Warehouse(){
     const [data, setData] = useState([]);
@@ -15,13 +15,13 @@ function Warehouse(){
         if (isMountedRef.current) {
             return;
         }
-        getData();
+        GetData();
         isMountedRef.current = true;
     }, [])
 
     //ПОЛУЧЕНИЕ ВСЕХ СКЛАДОВ
-    async function getData(){
-        const result = await GetAllData("http://localhost:5000/warehouse");
+    async function GetData(){
+        const result = await getAllData("http://localhost:5000/warehouse");
         setData(result);
       };
     //ПОЛУЧЕНИЕ СКЛАДА ПО ID
@@ -40,9 +40,9 @@ function Warehouse(){
             
     }
     //ДОБАВЛЕНИЕ
-    async function addNewData(){
+    async function AddNewData(){
         if(name.length > 0 && address.length > 0){
-            const result = await AddData("http://localhost:5000/warehouse/create", {name, address});
+            const result = await addData("http://localhost:5000/warehouse/create", {name, address});
             setData([...data, result])
             setModalVisible(false);
             setName('');
@@ -53,17 +53,17 @@ function Warehouse(){
         }
     }
     //УДАЛЕНИЕ
-    async function removeData(id){
-        const result = await RemoveData(`http://localhost:5000/warehouse/delete/${id}`);
+    async function RemoveData(id){
+        const result = await removeData(`http://localhost:5000/warehouse/delete/${id}`);
         if(result){
             const newData = data.filter(item => item.id !== id);
             setData(newData);
         }
     }
     //ОБНОВЛЕНИЕ
-    async function updateData() {
+    async function UpdateData() {
         if(name.length > 0 && address.length > 0){
-            const result = await UpdateData("http://localhost:5000/warehouse/update", {id: editId, name, address});
+            const result = await updateData("http://localhost:5000/warehouse/update", {id: editId, name, address});
             if(result){
                 const newData = [...data];
                 const index = newData.findIndex(item => item.id === editId);
@@ -99,8 +99,8 @@ function Warehouse(){
                     <input placeholder='Name...' value={name} onChange={(e) => setName(e.target.value)}></input>
                     <input placeholder='Address...' value={address} onChange={(e) => setAddress(e.target.value)}></input>
                     {!editId ? 
-                    <button className={styles.modalAddBtn} onClick={addNewData}>Add</button> :
-                    <button className={styles.modalAddBtn} onClick={updateData}>Update</button>
+                    <button className={styles.modalAddBtn} onClick={AddNewData}>Add</button> :
+                    <button className={styles.modalAddBtn} onClick={UpdateData}>Update</button>
                     }
                     
                 </div>
@@ -119,7 +119,7 @@ function Warehouse(){
                                             <span className={styles.name}>{item.name}</span>
                                             <span className={styles.address}>{item.address}</span>
                                         </div>
-                                        <button className={styles.removeBtn} onClick={() => removeData(item.id)}>Remove</button>
+                                        <button className={styles.removeBtn} onClick={() => RemoveData(item.id)}>Remove</button>
                                         <button className={styles.updateBtn} onClick={() => EditData(item.id)}>Update</button>
                                     </div>
                                 );
