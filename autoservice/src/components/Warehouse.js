@@ -4,10 +4,8 @@ import {getAllData, addData, removeData, updateData} from '../modules/requests';
 
 function Warehouse(){
     const [data, setData] = useState([]);
+    const [editData, setEditData] = useState({name: '', address: ''});
     const [modalVisible, setModalVisible] = useState(false);
-    const [name, setName] = useState('');
-    const [address, setAddress] = useState('');
-    const [editId, setEditId] = useState(null);
     const [filterName, setFilterName] = useState('');
     const isMountedRef = useRef(false);
 
@@ -41,12 +39,12 @@ function Warehouse(){
     }
     //ДОБАВЛЕНИЕ
     async function AddNewData(){
+        const { name, address } = editData;
         if(name.length > 0 && address.length > 0){
             const result = await addData("http://localhost:5000/warehouse/create", {name, address});
             setData([...data, result])
             setModalVisible(false);
-            setName('');
-            setAddress('');
+            setEditData({ name: '', address: '' });
         }
         else{
             Cancel();
@@ -62,33 +60,29 @@ function Warehouse(){
     }
     //ОБНОВЛЕНИЕ
     async function UpdateData() {
+        const {id, name, address} = editData;
         if(name.length > 0 && address.length > 0){
-            const result = await updateData("http://localhost:5000/warehouse/update", {id: editId, name, address});
+            const result = await updateData("http://localhost:5000/warehouse/update", {id: Number(id), name, address});
             if(result){
                 const newData = [...data];
-                const index = newData.findIndex(item => item.id === editId);
-                newData[index] = {id: editId, name: name, address: address};
+                const index = newData.findIndex(item => item.id === id);
+                newData[index] = { ...editData};
+                console.log(newData[index])
                 setData(newData);
             }
             setModalVisible(false);
-            setEditId(null);
-            setName('');
-            setAddress('');    
+            setEditData({ name: '', address: '' });
         } else {
             Cancel();
         }
       }
-      function EditData(id){
-        const item = data.find(item => item.id === id);
-        setName(item.name);
-        setAddress(item.address);
-        setEditId(item.id);
+      function EditData(item){
+        setEditData(item);
         setModalVisible(true);
     }
     function Cancel(){
         setModalVisible(false);
-        setName('');
-        setAddress('');
+        setEditData({ name: '', address: '' });
     }
     return (
         <div className={styles.content}>
@@ -96,9 +90,9 @@ function Warehouse(){
             <div className={styles.modal}>
                 <div className={styles.modalBlock}>
                     <button className={styles.cancelBtn} onClick={Cancel}>X</button>
-                    <input placeholder='Name...' value={name} onChange={(e) => setName(e.target.value)}></input>
-                    <input placeholder='Address...' value={address} onChange={(e) => setAddress(e.target.value)}></input>
-                    {!editId ? 
+                    <input placeholder='Name...' value={editData.name} onChange={(e) => setEditData({ ...editData, name: e.target.value })}></input>
+                    <input placeholder='Address...' value={editData.address} onChange={(e) => setEditData({ ...editData, address: e.target.value })}></input>
+                    {!editData.id ? 
                     <button className={styles.modalAddBtn} onClick={AddNewData}>Add</button> :
                     <button className={styles.modalAddBtn} onClick={UpdateData}>Update</button>
                     }
@@ -111,7 +105,7 @@ function Warehouse(){
             </div>
             <button className={styles.addBtn} onClick={() => setModalVisible(true)}>Add Data</button>
             <div className={styles.cards}>
-                        {!data ? (<span style={{fontSize: "2rem", margin:"5%"}}>No warehouse found</span>) : 
+            {!data ? (<span style={{fontSize: "2rem", margin:"5%"}}>No warehouse found</span>) : 
                             data.filter((item) => item.name.toLowerCase().includes(filterName.toLowerCase())).map((item) => {
                                 return (
                                     <div key={item.id} className={styles.card}>
@@ -120,7 +114,7 @@ function Warehouse(){
                                             <span className={styles.address}>{item.address}</span>
                                         </div>
                                         <button className={styles.removeBtn} onClick={() => RemoveData(item.id)}>Remove</button>
-                                        <button className={styles.updateBtn} onClick={() => EditData(item.id)}>Update</button>
+                                        <button className={styles.updateBtn} onClick={() => EditData(item)}>Update</button>
                                     </div>
                                 );
                         })}         
