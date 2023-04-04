@@ -1,5 +1,6 @@
 import {useState, useEffect, useRef} from 'react';
 import styles from '../styles/CardsModule.module.css'
+import {getAllData, addData, removeData, updateData} from '../modules/requests';
 
 function WorkList(){
     const [filterName, setFilterName] = useState('');
@@ -22,39 +23,18 @@ function WorkList(){
 
     //ПОЛУЧЕНИЕ ВСЕХ УСЛУГ
     async function GetAllData(){
-        
-            await fetch("/worklist",
-            {
-                method: "GET",
-                headers: {
-                    'Content-Type': 'application/json'
-                },
-            })
-            .then((res) => res.json())
-            .then((data) => {
-                setData(data);
-            })
-            .catch ((error)=> {
-                console.error(error)});
+        const result = await getAllData("http://localhost:5000/worklist");
+        setData(result);
     }
     //ДОБАВЛЕНИЕ
     async function AddData(){
-        await fetch('/worklist/create', {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json'
-            },
-            body: JSON.stringify({
-                name: name,
-                description: description,
-                price: Number(price),
-                duration: Number(duration)
-            })
-        })
-        .then((res) => res.json())
-        .then((result) => {
-            setData([...data, result]);
-        });
+        const result = await addData("http://localhost:5000/worklist/create", {
+            name: name,
+            description: description,
+            price: Number(price),
+            duration: Number(duration)
+            });
+        setData([...data, result]);
         setModalVisible(false);
         setName('');
         setDescription('');
@@ -63,57 +43,27 @@ function WorkList(){
     };
     //УДАЛЕНИЕ
     async function RemoveData(id){
-        await fetch(`/worklist/delete/${id}`,
-            {
-                method: "DELETE",
-                headers: {
-                    'Content-Type': 'application/json'
-                  },
-            })
-            .then((res) => res.json())
-            .then((result) => 
-            {
-                console.log(result);
-                if(result){
-                    const newData = data.filter(item => item.id !== id);
-                    setData(newData);
-                }
-            }
-            )
-            .catch(error => {
-                console.log(error)
-            })
+        const result = await removeData(`http://localhost:5000/worklist/delete/${id}`);
+        if(result){
+            const newData = data.filter(item => item.id !== id);
+            setData(newData);
+        }
     }
     //ОБНОВЛЕНИЕ
     async function UpdateData() {
-        await fetch(`/detail/update`,
-        {
-            method: "PATCH",
-            headers: {
-                'Content-Type': 'application/json'
-            },
-            body: JSON.stringify({ 
+        const result = await updateData("http://localhost:5000/worklist/update", {
                 id: Number(editId),
                 name: name,
                 description: description,
                 price: Number(price),
                 cduration: Number(duration)
-            })
-        })
-        .then((res) => res.json())
-        .then((result) => 
-        {
+            });
             if(result){
                 const newData = [...data];
                 const index = newData.findIndex(item => item.id === editId);
                 newData[index] = {id: editId, name: name, description: description, price: Number(price), duration: Number(duration)};
                 setData(newData);
             }
-        }
-        )
-        .catch(error => {
-            console.log(error)
-        })
         setModalVisible(false);
         setEditId(null);
         setName('');
