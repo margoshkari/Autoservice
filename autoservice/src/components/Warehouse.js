@@ -1,5 +1,6 @@
 import {useState, useEffect, useRef} from 'react';
 import styles from '../styles/CardsModule.module.css'
+import {GetAllData, AddData, RemoveData, UpdateData} from '../modules/requests';
 
 function Warehouse(){
     const [data, setData] = useState([]);
@@ -14,24 +15,15 @@ function Warehouse(){
         if (isMountedRef.current) {
             return;
         }
-        GetAllData();
+        getData();
         isMountedRef.current = true;
     }, [])
 
     //ПОЛУЧЕНИЕ ВСЕХ СКЛАДОВ
-    async function GetAllData(){
-        await fetch("/warehouse",
-            {
-                method: "GET",
-                headers: {
-                    'Content-Type': 'application/json'
-                  },
-            })
-            .then((res) => res.json())
-            .then((data) => setData(data))
-            .catch ((error)=> {
-            console.error(error)});
-    }
+    async function getData(){
+        const result = await GetAllData("http://localhost:5000/warehouse");
+        setData(result);
+      };
     //ПОЛУЧЕНИЕ СКЛАДА ПО ID
     async function GetById(id){
         await fetch(`/warehouse/${id}`,
@@ -48,24 +40,10 @@ function Warehouse(){
             
     }
     //ДОБАВЛЕНИЕ
-    async function AddData(){
+    async function addNewData(){
         if(name.length > 0 && address.length > 0){
-                await fetch(`/warehouse/create`,
-                {
-                    method: "POST",
-                    headers: {
-                        'Content-Type': 'application/json'
-                    },
-                    body: JSON.stringify({ 
-                        name: name,
-                        address: address
-                    })
-                })
-                .then((res) => res.json())
-                .then((newData) => setData([...data, newData]))
-                .catch(error => {
-                    console.log(error)
-                })
+            const result = await AddData("http://localhost:5000/warehouse/create", {name, address});
+            setData([...data, result])
             setModalVisible(false);
             setName('');
             setAddress('');
@@ -75,60 +53,27 @@ function Warehouse(){
         }
     }
     //УДАЛЕНИЕ
-    async function RemoveData(id){
-            await fetch(`/warehouse/delete/${id}`,
-            {
-                method: "DELETE",
-                headers: {
-                    'Content-Type': 'application/json'
-                  },
-            })
-            .then((res) => res.json())
-            .then((result) => 
-            {
-                if(result){
-                    const newData = data.filter(item => item.id !== id);
-                    setData(newData);
-                }
-            }
-            )
-            .catch(error => {
-                console.log(error)
-            })
+    async function removeData(id){
+        const result = await RemoveData(`http://localhost:5000/warehouse/delete/${id}`);
+        if(result){
+            const newData = data.filter(item => item.id !== id);
+            setData(newData);
+        }
     }
     //ОБНОВЛЕНИЕ
-    async function UpdateData() {
+    async function updateData() {
         if(name.length > 0 && address.length > 0){
-                await fetch(`/warehouse/update`,
-                {
-                    method: "PATCH",
-                    headers: {
-                        'Content-Type': 'application/json'
-                    },
-                    body: JSON.stringify({ 
-                        id: editId,
-                        name: name,
-                        address: address
-                    })
-                })
-                .then((res) => res.json())
-                .then((result) => 
-                {
-                    if(result){
-                        const newData = [...data];
-                        const index = newData.findIndex(item => item.id === editId);
-                        newData[index] = {id: editId, name: name, address: address};
-                        setData(newData);
-                    }
-                }
-                )
-                .catch(error => {
-                    console.log(error)
-                })
+            const result = await UpdateData("http://localhost:5000/warehouse/update", {id: editId, name, address});
+            if(result){
+                const newData = [...data];
+                const index = newData.findIndex(item => item.id === editId);
+                newData[index] = {id: editId, name: name, address: address};
+                setData(newData);
+            }
             setModalVisible(false);
             setEditId(null);
             setName('');
-            setAddress('');
+            setAddress('');    
         } else {
             Cancel();
         }
@@ -154,8 +99,8 @@ function Warehouse(){
                     <input placeholder='Name...' value={name} onChange={(e) => setName(e.target.value)}></input>
                     <input placeholder='Address...' value={address} onChange={(e) => setAddress(e.target.value)}></input>
                     {!editId ? 
-                    <button className={styles.modalAddBtn} onClick={AddData}>Add</button> :
-                    <button className={styles.modalAddBtn} onClick={UpdateData}>Update</button>
+                    <button className={styles.modalAddBtn} onClick={addNewData}>Add</button> :
+                    <button className={styles.modalAddBtn} onClick={updateData}>Update</button>
                     }
                     
                 </div>
@@ -174,7 +119,7 @@ function Warehouse(){
                                             <span className={styles.name}>{item.name}</span>
                                             <span className={styles.address}>{item.address}</span>
                                         </div>
-                                        <button className={styles.removeBtn} onClick={() => RemoveData(item.id)}>Remove</button>
+                                        <button className={styles.removeBtn} onClick={() => removeData(item.id)}>Remove</button>
                                         <button className={styles.updateBtn} onClick={() => EditData(item.id)}>Update</button>
                                     </div>
                                 );
