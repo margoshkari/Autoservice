@@ -8,7 +8,7 @@ import WorkList from './components/WorkList';
 function App() {
   return (
     <div className="App">
-     <Detail/>
+     <DetailList/>
     </div>
   );
 }

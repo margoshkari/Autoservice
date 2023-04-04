@@ -1,5 +1,6 @@
 import {useState, useEffect, useRef} from 'react';
 import styles from '../styles/CardsModule.module.css'
+import {getAllData, addData, removeData, updateData} from '../modules/requests';
 
 function DetailList(){
     const [data, setData] = useState([]);
@@ -20,72 +21,44 @@ function DetailList(){
 
     //ПОЛУЧЕНИЕ ВСЕХ СПИСКОВ
     async function GetAllData(){
-        
-            await fetch("/detailList",
-            {
-                method: "GET",
-                headers: {
-                    'Content-Type': 'application/json'
-                },
-            })
-            .then((res) => res.json())
-            .then((data) => {
-                setData(data);
-            })
-            .catch ((error)=> {
-                console.error(error)});
+        const result = await getAllData("http://localhost:5000/detailList");
+        setData(result);
     }
     //ДОБАВЛЕНИЕ
     async function AddData(){
-        await fetch('/detailList/create', {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json'
-            },
-            body: JSON.stringify({
-                warehouseId: Number(warehouseId),
-                detailId: Number(detailId),
-                count: Number(count)
-            })
-        })
-        .then((res) => res.json())
-        .then((result) => {
-            setData([...data, result]);
-        });
+        const result = await addData("http://localhost:5000/detailList/create", {
+            warehouseId: Number(warehouseId),
+            detailId: Number(detailId),
+            count: Number(count)
+            });
+        setData([...data, result]);
         setModalVisible(false);
         setWarehouseId(0);
         setDetailId(0);
         setCount(0);
     };
+    //УДАЛЕНИЕ
+    async function RemoveData(id){
+        const result = await removeData(`http://localhost:5000/detailList/delete/${id}`);
+        if(result){
+            const newData = data.filter(item => item.id !== id);
+            setData(newData);
+        }
+    }
      //ОБНОВЛЕНИЕ
      async function UpdateData() {
-        await fetch(`/detailList/update`,
-        {
-            method: "PATCH",
-            headers: {
-                'Content-Type': 'application/json'
-            },
-            body: JSON.stringify({ 
-                id: Number(editId),
-                warehouseId: Number(warehouseId),
-                detailId: Number(detailId),
-                count: Number(count)
-            })
-        })
-        .then((res) => res.json())
-        .then((result) => 
-        {
+        const result = await updateData("http://localhost:5000/detailList/update", {
+            id: Number(editId),
+            warehouseId: Number(warehouseId),
+            detailId: Number(detailId),
+            count: Number(count)
+            });
             if(result){
                 const newData = [...data];
                 const index = newData.findIndex(item => item.id === editId);
                 newData[index] = {id: editId, warehouseId: warehouseId, detailId: detailId, count: count};
                 setData(newData);
             }
-        }
-        )
-        .catch(error => {
-            console.log(error)
-        })
         setEditId(null);
         setModalVisible(false);
         setWarehouseId(0);
@@ -106,29 +79,6 @@ function DetailList(){
         setWarehouseId(0);
         setDetailId(0);
         setCount(0);
-    }
-    //УДАЛЕНИЕ
-    async function RemoveData(id){
-        await fetch(`/detailList/delete/${id}`,
-            {
-                method: "DELETE",
-                headers: {
-                    'Content-Type': 'application/json'
-                  },
-            })
-            .then((res) => res.json())
-            .then((result) => 
-            {
-                console.log(result);
-                if(result){
-                    const newData = data.filter(item => item.id !== id);
-                    setData(newData);
-                }
-            }
-            )
-            .catch(error => {
-                console.log(error)
-            })
     }
 
     return(
