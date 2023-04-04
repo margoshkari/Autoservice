@@ -56,7 +56,7 @@ function WorkList(){
                 name: name,
                 description: description,
                 price: Number(price),
-                cduration: Number(duration)
+                duration: Number(duration)
             });
             if(result){
                 const newData = [...data];
@@ -117,9 +117,11 @@ function WorkList(){
                                     <div key={item.id} className={styles.card} style={{height: "25vh"}}>
                                         <div className={styles.cardInfo}>
                                             <span className={styles.name}>{item.name}</span>
-                                            <span className={styles.address}>{item.description}</span>
-                                            <span className={styles.address}>{item.price}</span>
-                                            <span className={styles.address}>{item.duration}</span>
+                                            <div className={styles.info}>
+                                                <span className={styles.address}>{item.description}</span>
+                                                <span className={styles.address}>Price: {item.price}</span>
+                                                <span className={styles.address}>Duration: {item.duration}</span>
+                                            </div>
                                         </div>
                                         <button className={styles.removeBtn} onClick={() => RemoveData(item.id)}>Remove</button>
                                         <button className={styles.updateBtn} onClick={() => EditData(item.id)}>Update</button>

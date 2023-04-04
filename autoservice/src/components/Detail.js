@@ -123,13 +123,15 @@ function Detail(){
                         {!data ? (<span style={{fontSize: "2rem", margin:"5%"}}>No detail found</span>) : 
                             data.filter((item) => item.model.toLowerCase().includes(filterModel.toLowerCase())).map((item) => {
                                 return (
-                                    <div key={item.id} className={styles.card} style={{height: "30vh"}}>
+                                    <div key={item.id} className={styles.card} style={{height: "35vh", width: "15%"}}>
                                         <div className={styles.cardInfo}>
                                             <span className={styles.name}>{item.model}</span>
-                                            <span className={styles.address}>{item.vendorCode}</span>
-                                            <span className={styles.address}>{item.description}</span>
-                                            <span className={styles.address}>{item.compatibleVehicles}</span>
-                                            <span className={styles.address}>{item.catId}</span>
+                                            <div className={styles.info}>
+                                                <span className={styles.address}>Vendor code: {item.vendorCode}</span>
+                                                <span className={styles.address}>{item.description}</span>
+                                                <span className={styles.address}>Compatible Vehicles: {item.compatibleVehicles}</span>
+                                                <span className={styles.address}>Category id: {item.catId}</span>
+                                            </div>
                                         </div>
                                         <button className={styles.removeBtn} onClick={() => RemoveData(item.id)}>Remove</button>
                                         <button className={styles.updateBtn} onClick={() => EditData(item.id)}>Update</button>
