@@ -4,12 +4,9 @@ import {getAllData, addData, removeData, updateData} from '../modules/requests';
 
 function DetailList(){
     const [data, setData] = useState([]);
-    const [editId, setEditId] = useState(null);
+    const [editData, setEditData] = useState({warehouseId: 0, detailId: 0, count: 0});
     const [modalVisible, setModalVisible] = useState(false);
     const isMountedRef = useRef(false);
-    const [warehouseId, setWarehouseId] = useState(0);
-    const [detailId, setDetailId] = useState(0);
-    const [count, setCount] = useState(0);
 
     useEffect(() => {
         if (isMountedRef.current) {
@@ -26,6 +23,7 @@ function DetailList(){
     }
     //ДОБАВЛЕНИЕ
     async function AddData(){
+        const {warehouseId, detailId, count} = editData;
         const result = await addData("http://localhost:5000/detailList/create", {
             warehouseId: Number(warehouseId),
             detailId: Number(detailId),
@@ -33,9 +31,7 @@ function DetailList(){
             });
         setData([...data, result]);
         setModalVisible(false);
-        setWarehouseId(0);
-        setDetailId(0);
-        setCount(0);
+        setEditData({warehouseId: 0, detailId: 0, count: 0});
     };
     //УДАЛЕНИЕ
     async function RemoveData(id){
@@ -47,38 +43,30 @@ function DetailList(){
     }
      //ОБНОВЛЕНИЕ
      async function UpdateData() {
+        const {id, warehouseId, detailId, count} = editData;
         const result = await updateData("http://localhost:5000/detailList/update", {
-            id: Number(editId),
+            id: Number(id),
             warehouseId: Number(warehouseId),
             detailId: Number(detailId),
             count: Number(count)
             });
             if(result){
                 const newData = [...data];
-                const index = newData.findIndex(item => item.id === editId);
-                newData[index] = {id: editId, warehouseId: warehouseId, detailId: detailId, count: count};
+                const index = newData.findIndex(item => item.id === Number(id));
+                newData[index] = {id: Number(id), warehouseId: warehouseId, detailId: detailId, count: count};
                 setData(newData);
             }
-        setEditId(null);
         setModalVisible(false);
-        setWarehouseId(0);
-        setDetailId(0);
-        setCount(0);
+        setEditData({warehouseId: 0, detailId: 0, count: 0});
                 
       }
-      function EditData(id){
-        const item = data.find(item => item.id === id);
-        setEditId(id);
+      function EditData(item){
         setModalVisible(true);
-        setWarehouseId(item.warehouseId);
-        setDetailId(item.detailId);
-        setCount(item.count);
+        setEditData(item);
     }
     function Cancel(){
         setModalVisible(false);
-        setWarehouseId(0);
-        setDetailId(0);
-        setCount(0);
+        setEditData({warehouseId: 0, detailId: 0, count: 0});
     }
 
     return(
@@ -87,10 +75,10 @@ function DetailList(){
             <div className={styles.modal}>
                 <div className={styles.modalBlock}>
                     <button className={styles.cancelBtn} onClick={Cancel}>X</button>
-                    <input type={'number'} placeholder='Warehouse ID...' value={warehouseId} onChange={(e) => setWarehouseId(e.target.value)}></input>
-                    <input type={'number'} placeholder='Detail Id...' value={detailId} onChange={(e) => setDetailId(e.target.value)}></input>
-                    <input type={'number'} placeholder='Count...' value={count} onChange={(e) => setCount(e.target.value)}></input>
-                    {!editId ? 
+                    <input type={'number'} placeholder='Warehouse ID...' value={editData.warehouseId} onChange={(e) => setEditData({...editData, warehouseId: e.target.value})}></input>
+                    <input type={'number'} placeholder='Detail Id...' value={editData.detailId} onChange={(e) => setEditData({...editData, detailId: e.target.value})}></input>
+                    <input type={'number'} placeholder='Count...' value={editData.count} onChange={(e) => setEditData({...editData, count: e.target.value})}></input>
+                    {!editData.id ? 
                     <button className={styles.modalAddBtn} onClick={AddData}>Add</button> :
                     <button className={styles.modalAddBtn} onClick={UpdateData}>Update</button>
                     }
@@ -110,7 +98,7 @@ function DetailList(){
                                             <span className={styles.address}>Count: {item.count}</span>
                                         </div>
                                         <button className={styles.removeBtn} onClick={() => RemoveData(item.id)}>Remove</button>
-                                        <button className={styles.updateBtn} onClick={() => EditData(item.id)}>Update</button>
+                                        <button className={styles.updateBtn} onClick={() => EditData(item)}>Update</button>
                                     </div>
                                 );
                         })}    
