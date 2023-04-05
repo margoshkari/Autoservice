@@ -3,14 +3,10 @@ import styles from '../styles/CardsModule.module.css'
 import {getAllData, addData, removeData, updateData} from '../modules/requests';
 
 function WorkList(){
-    const [filterName, setFilterName] = useState('');
     const [data, setData] = useState([]);
+    const [editData, setEditData] = useState({name: '', description: '', price: 0, duration: 0});
     const [modalVisible, setModalVisible] = useState(false);
-    const [name, setName] = useState('');
-    const [description, setDescription] = useState('');
-    const [price, setPrice] = useState(0);
-    const [duration, setDuration] = useState(0);
-    const [editId, setEditId] = useState(null);
+    const [filterName, setFilterName] = useState('');
     const isMountedRef = useRef(false);
 
     useEffect(() => {
@@ -28,6 +24,7 @@ function WorkList(){
     }
     //ДОБАВЛЕНИЕ
     async function AddData(){
+        const {name, description, price, duration} = editData;
         const result = await addData("http://localhost:5000/worklist/create", {
             name: name,
             description: description,
@@ -36,10 +33,7 @@ function WorkList(){
             });
         setData([...data, result]);
         setModalVisible(false);
-        setName('');
-        setDescription('');
-        setPrice(0);
-        setDuration(0);
+        setEditData({name: '', description: '', price: 0, duration: 0});
     };
     //УДАЛЕНИЕ
     async function RemoveData(id){
@@ -51,8 +45,9 @@ function WorkList(){
     }
     //ОБНОВЛЕНИЕ
     async function UpdateData() {
+        const {id, name, description, price, duration} = editData;
         const result = await updateData("http://localhost:5000/worklist/update", {
-                id: Number(editId),
+                id: Number(id),
                 name: name,
                 description: description,
                 price: Number(price),
@@ -60,33 +55,20 @@ function WorkList(){
             });
             if(result){
                 const newData = [...data];
-                const index = newData.findIndex(item => item.id === editId);
-                newData[index] = {id: editId, name: name, description: description, price: Number(price), duration: Number(duration)};
+                const index = newData.findIndex(item => item.id === Number(id));
+                newData[index] = {id: Number(id), name: name, description: description, price: Number(price), duration: Number(duration)};
                 setData(newData);
             }
         setModalVisible(false);
-        setEditId(null);
-        setName('');
-        setDescription('');
-        setPrice(0);
-        setDuration(0);
-                
+        setEditData({name: '', description: '', price: 0, duration: 0});
       }
-      function EditData(id){
-        const item = data.find(item => item.id === id);
+      function EditData(item){
         setModalVisible(true);
-        setEditId(item.id);
-        setName(item.name);
-        setDescription(item.description);
-        setPrice(item.price);
-        setDuration(item.duration);
+        setEditData(item);
     }
     function Cancel(){
         setModalVisible(false);
-        setName('');
-        setDescription('');
-        setPrice(0);
-        setDuration(0);
+        setEditData({name: '', description: '', price: 0, duration: 0});
     }
     return(
         <div className={styles.content}>
@@ -94,11 +76,11 @@ function WorkList(){
             <div className={styles.modal}>
                 <div className={styles.modalBlock}>
                     <button className={styles.cancelBtn} onClick={Cancel}>X</button>
-                    <input placeholder='Name...' value={name} onChange={(e) => setName(e.target.value)}></input>
-                    <input placeholder='Description...' value={description} onChange={(e) => setDescription(e.target.value)}></input>
-                    <input type={'number'} placeholder='Price...' value={price} onChange={(e) => setPrice(e.target.value)}></input>
-                    <input type={'number'} placeholder='Duration...' value={duration} onChange={(e) => setDuration(e.target.value)}></input>
-                    {!editId ? 
+                    <input placeholder='Name...' value={editData.name} onChange={(e) => setEditData({...editData, name: e.target.value})}></input>
+                    <input placeholder='Description...' value={editData.description} onChange={(e) => setEditData({...editData, description: e.target.value})}></input>
+                    <input type={'number'} placeholder='Price...' value={editData.price} onChange={(e) => setEditData({...editData, price: e.target.value})}></input>
+                    <input type={'number'} placeholder='Duration...' value={editData.duration} onChange={(e) => setEditData({...editData, duration: e.target.value})}></input>
+                    {!editData.id ? 
                     <button className={styles.modalAddBtn} onClick={AddData}>Add</button> :
                     <button className={styles.modalAddBtn} onClick={UpdateData}>Update</button>
                     }
@@ -124,7 +106,7 @@ function WorkList(){
                                             </div>
                                         </div>
                                         <button className={styles.removeBtn} onClick={() => RemoveData(item.id)}>Remove</button>
-                                        <button className={styles.updateBtn} onClick={() => EditData(item.id)}>Update</button>
+                                        <button className={styles.updateBtn} onClick={() => EditData(item)}>Update</button>
                                     </div>
                                 );
                         })}    
