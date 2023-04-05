@@ -5,12 +5,10 @@ import {getAllData, addData, removeData, updateData} from '../modules/requests';
 
 function Category(){
     const [data, setData] = useState([]);
+    const [editData, setEditData] = useState({name: '', parentCategory: null});
     const [category, setCategory] = useState({});
     const [modalVisible, setModalVisible] = useState(false);
-    const [name, setName] = useState('');
     const [searchName, setSearchName] = useState('');
-    const [parentCategory, setParentCategory] = useState(0);
-    const [editId, setEditId] = useState(null);
     const isMountedRef = useRef(false);
 
     useEffect(() => {
@@ -63,6 +61,7 @@ function Category(){
     }
     //ДОБАВЛЕНИЕ
     async function AddData(){
+        const {name, parentCategory} = editData;
         if(name.length > 0 && parentCategory >= 0){
             const result = await addData("http://localhost:5000/category/create", {
                 name: name, 
@@ -70,8 +69,7 @@ function Category(){
             });
             setData([...data, result])
             setModalVisible(false);
-            setName('');
-            setParentCategory('');
+            setEditData({ name: '', parentCategory: null });
         }
         else{
             Cancel();
@@ -94,16 +92,17 @@ function Category(){
       };
     //ОБНОВЛЕНИЕ
     async function UpdateData() {
+        const {id, name, parentCategory} = editData;
         if(name.length > 0){
             const result = await updateData("http://localhost:5000/category/update", {
-                id: editId,
+                id: Number(id),
                 name: name, 
                 parentCategory: parentCategory ? Number(parentCategory) : null
             });
             if(result){
                 const newData = [...data];
-                const index = newData.findIndex(item => item.id === editId);
-                newData[index] = {id: editId, name: name, address: parentCategory};
+                const index = newData.findIndex(item => item.id === Number(id));
+                newData[index] = {id: Number(id), name: name, address: parentCategory};
                 GetAllData();
             }
         }
@@ -111,21 +110,15 @@ function Category(){
             Cancel();
         }
         setModalVisible(false);
-        setEditId(null);
-        setName('');
-        setParentCategory(null);    
+        setEditData({ name: '', parentCategory: null }); 
       }
-      function EditData(id){
-        const item = data.find(item => item.id === id);
-        setName(item.name);
-        setParentCategory(item.address);
-        setEditId(item.id);
+      function EditData(item){
+        setEditData(item); 
         setModalVisible(true);
     }
     function Cancel(){
         setModalVisible(false);
-        setName('');
-        setParentCategory('');
+        setEditData({ name: '', parentCategory: null }); 
     }
     return (
         <div className={styles.content}>
@@ -133,9 +126,9 @@ function Category(){
             <div className={styles.modal}>
                 <div className={styles.modalBlock}>
                     <button className={styles.cancelBtn} onClick={Cancel}>X</button>
-                    <input placeholder='Name...' value={name} onChange={(e) => setName(e.target.value)}></input>
-                    <input type={'number'} placeholder='Parent Category ID...' value={parentCategory} onChange={(e) => setParentCategory(e.target.value)}></input>
-                    {!editId ? 
+                    <input placeholder='Name...' value={editData.name} onChange={(e) => setEditData({ ...editData, name: e.target.value })}></input>
+                    <input type={'number'} placeholder='Parent Category ID...' value={editData.parentCategory} onChange={(e) => setEditData({ ...editData, parentCategory: e.target.value })}></input>
+                    {!editData.id ? 
                     <button className={styles.modalAddBtn} onClick={AddData}>Add</button> :
                     <button className={styles.modalAddBtn} onClick={UpdateData}>Update</button>
                     }
@@ -157,7 +150,7 @@ function Category(){
                                             {item.parentCategory ? <span className={styles.address}>{GetCategoryNameById(item.parentCategory) ? <span>Parent: {GetCategoryNameById(item.parentCategory)}</span> : <span className={styles.empty}></span>}</span> : <span className={styles.empty}></span>}
                                         </div>
                                         <button className={styles.removeBtn} onClick={() => RemoveData(item.id)}>Remove</button>
-                                        <button className={styles.updateBtn} onClick={() => EditData(item.id)}>Update</button>
+                                        <button className={styles.updateBtn} onClick={() => EditData(item)}>Update</button>
                                     </div>
                                 );
                         })}    
