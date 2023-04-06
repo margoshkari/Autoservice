@@ -19,7 +19,7 @@ function Warehouse(){
 
     //ПОЛУЧЕНИЕ ВСЕХ СКЛАДОВ
     async function GetData(){
-        const result = await getAllData("https://localhost:7083/warehouse");
+        const result = await getAllData("/warehouse");
         setData(result);
       };
     //ПОЛУЧЕНИЕ СКЛАДА ПО ID
@@ -41,7 +41,7 @@ function Warehouse(){
     async function AddNewData(){
         const { name, address } = editData;
         if(name.length > 0 && address.length > 0){
-            const result = await addData("https://localhost:7083/warehouse/create", {name, address});
+            const result = await addData("/warehouse/create", {name, address});
             setData([...data, result])
             setModalVisible(false);
             setEditData({ name: '', address: '' });
@@ -52,7 +52,7 @@ function Warehouse(){
     }
     //УДАЛЕНИЕ
     async function RemoveData(id){
-        const result = await removeData(`https://localhost:7083/warehouse/delete/${id}`);
+        const result = await removeData(`/warehouse/delete/${id}`);
         if(result){
             const newData = data.filter(item => item.id !== id);
             setData(newData);
@@ -62,7 +62,7 @@ function Warehouse(){
     async function UpdateData() {
         const {id, name, address} = editData;
         if(name.length > 0 && address.length > 0){
-            const result = await updateData("https://localhost:7083/warehouse/update", {id: Number(id), name, address});
+            const result = await updateData("/warehouse/update", {id: Number(id), name, address});
             if(result){
                 const newData = [...data];
                 const index = newData.findIndex(item => item.id === id);
