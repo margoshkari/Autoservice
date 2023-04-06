@@ -19,13 +19,13 @@ function WorkList(){
 
     //ПОЛУЧЕНИЕ ВСЕХ УСЛУГ
     async function GetAllData(){
-        const result = await getAllData("http://localhost:5000/worklist");
+        const result = await getAllData("https://localhost:7083/worklist");
         setData(result);
     }
     //ДОБАВЛЕНИЕ
     async function AddData(){
         const {name, description, price, duration} = editData;
-        const result = await addData("http://localhost:5000/worklist/create", {
+        const result = await addData("https://localhost:7083/worklist/create", {
             name: name,
             description: description,
             price: Number(price),
@@ -37,7 +37,7 @@ function WorkList(){
     };
     //УДАЛЕНИЕ
     async function RemoveData(id){
-        const result = await removeData(`http://localhost:5000/worklist/delete/${id}`);
+        const result = await removeData(`https://localhost:7083/worklist/delete/${id}`);
         if(result){
             const newData = data.filter(item => item.id !== id);
             setData(newData);
@@ -46,7 +46,7 @@ function WorkList(){
     //ОБНОВЛЕНИЕ
     async function UpdateData() {
         const {id, name, description, price, duration} = editData;
-        const result = await updateData("http://localhost:5000/worklist/update", {
+        const result = await updateData("https://localhost:7083/worklist/update", {
                 id: Number(id),
                 name: name,
                 description: description,

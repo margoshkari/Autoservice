@@ -1,19 +1,20 @@
-//ПОЛУЧЕНИЕ ДАННЫХ
-async function getAllData(url){
+async function getAllData(url) {
     try {
-        const response = await fetch(url, {
-          method: 'GET',
-          headers: {
-            'Content-Type': 'application/json'
-          },
-        });
-        const data = await response.json();
-        return data;
-      } catch (error) {
-        console.error(error);
-        return null;
-      }
-}
+      const response = await fetch(url, {
+        method: 'GET',
+        headers: {
+            'Content-Type': 'application/json',
+            'Origin': 'http://localhost:3000'
+        },
+        mode: 'cors'
+      });
+      const data = await response.json();
+      return data;
+    } catch (error) {
+      console.error(error);
+      return null;
+    };
+  };
 //ДОБАВЛЕНИЕ
 async function addData(url, object){
     try {

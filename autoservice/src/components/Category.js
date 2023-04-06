@@ -21,7 +21,7 @@ function Category(){
 
     //ПОЛУЧЕНИЕ ВСЕХ КАТЕГОРИЙ
     async function GetAllData(){
-        const result = await getAllData("http://localhost:5000/category");
+        const result = await getAllData("https://localhost:7083/category");
         setData(result);
     }
     //ПОЛУЧЕНИЕ КАТЕГОРИИ ПО ID
@@ -63,7 +63,7 @@ function Category(){
     async function AddData(){
         const {name, parentCategory} = editData;
         if(name.length > 0 && parentCategory >= 0){
-            const result = await addData("http://localhost:5000/category/create", {
+            const result = await addData("https://localhost:7083/category/create", {
                 name: name, 
                 parentCategory: parentCategory ? Number(parentCategory) : null
             });
@@ -77,7 +77,7 @@ function Category(){
     }
     //УДАЛЕНИЕ
     async function RemoveData(id){
-        const result = await removeData(`http://localhost:5000/category/delete/${id}`);
+        const result = await removeData(`https://localhost:7083/category/delete/${id}`);
         if(result){
             setData(removeChildren(data, id));
         }
@@ -94,7 +94,7 @@ function Category(){
     async function UpdateData() {
         const {id, name, parentCategory} = editData;
         if(name.length > 0){
-            const result = await updateData("http://localhost:5000/category/update", {
+            const result = await updateData("https://localhost:7083/category/update", {
                 id: Number(id),
                 name: name, 
                 parentCategory: parentCategory ? Number(parentCategory) : null

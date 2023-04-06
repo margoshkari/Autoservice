@@ -18,13 +18,13 @@ function DetailList(){
 
     //ПОЛУЧЕНИЕ ВСЕХ СПИСКОВ
     async function GetAllData(){
-        const result = await getAllData("http://localhost:5000/detailList");
+        const result = await getAllData("https://localhost:7083/detailList");
         setData(result);
     }
     //ДОБАВЛЕНИЕ
     async function AddData(){
         const {warehouseId, detailId, count} = editData;
-        const result = await addData("http://localhost:5000/detailList/create", {
+        const result = await addData("https://localhost:7083/detailList/create", {
             warehouseId: Number(warehouseId),
             detailId: Number(detailId),
             count: Number(count)
@@ -35,7 +35,7 @@ function DetailList(){
     };
     //УДАЛЕНИЕ
     async function RemoveData(id){
-        const result = await removeData(`http://localhost:5000/detailList/delete/${id}`);
+        const result = await removeData(`https://localhost:7083/detailList/delete/${id}`);
         if(result){
             const newData = data.filter(item => item.id !== id);
             setData(newData);
@@ -44,7 +44,7 @@ function DetailList(){
      //ОБНОВЛЕНИЕ
      async function UpdateData() {
         const {id, warehouseId, detailId, count} = editData;
-        const result = await updateData("http://localhost:5000/detailList/update", {
+        const result = await updateData("https://localhost:7083/detailList/update", {
             id: Number(id),
             warehouseId: Number(warehouseId),
             detailId: Number(detailId),

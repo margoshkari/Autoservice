@@ -19,13 +19,13 @@ function Detail(){
 
     //ПОЛУЧЕНИЕ ВСЕХ ДЕТАЛЕЙ
     async function GetAllData(){
-        const result = await getAllData("http://localhost:5000/detail");
+        const result = await getAllData("https://localhost:7083/detail");
         setData(result);
     }
     //ДОБАВЛЕНИЕ
     async function AddData(){
         const {model, vendorCode, description, compatibleVehicles, catId} = editData;
-        const result = await addData("http://localhost:5000/detail/create", {
+        const result = await addData("https://localhost:7083/detail/create", {
             model: model,
             vendorCode: vendorCode,
             description: description,
@@ -38,7 +38,7 @@ function Detail(){
     };
     //УДАЛЕНИЕ
     async function RemoveData(id){
-        const result = await removeData(`http://localhost:5000/detail/delete/${id}`);
+        const result = await removeData(`https://localhost:7083/detail/delete/${id}`);
         if(result){
             const newData = data.filter(item => item.id !== id);
             setData(newData);
@@ -47,7 +47,7 @@ function Detail(){
     //ОБНОВЛЕНИЕ
     async function UpdateData() {
         const {id, model, vendorCode, description, compatibleVehicles, catId} = editData;
-        const result = await updateData("http://localhost:5000/detail/update", {
+        const result = await updateData("https://localhost:7083/detail/update", {
             id: Number(id),
             model: model,
             vendorCode: vendorCode,
