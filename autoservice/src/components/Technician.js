@@ -18,20 +18,20 @@ function Technician(){
     }, [])
     //ПОЛУЧЕНИЕ
     async function GetData(){
-        const result = await getAllData("https://localhost:7083/techician");
+        const result = await getAllData("http://localhost:5000/technician");
         setData(result);
     };
      //ДОБАВЛЕНИЕ
      async function AddNewData(){
         const { name, phone, specialization, startWork,startWorkInCompany } = editData;
-        const result = await addData("https://localhost:7083/techician/create", {name, phone, specialization, startWork,startWorkInCompany});
+        const result = await addData("http://localhost:5000/technician/create", {name, phone, specialization, startWork,startWorkInCompany});
             setData([...data, result])
             setModalVisible(false);
             setEditData({name: '', phone: '', specialization: '', startWork: '',startWorkInCompany: ''});
     }
     //УДАЛЕНИЕ
     async function RemoveData(id){
-        const result = await removeData(`https://localhost:7083/techician/delete/${id}`);
+        const result = await removeData(`http://localhost:5000/technician/delete/${id}`);
         if(result){
             const newData = data.filter(item => item.id !== id);
             setData(newData);
@@ -40,7 +40,7 @@ function Technician(){
     //ОБНОВЛЕНИЕ
     async function UpdateData() {
         const {id, name, phone, specialization, startWork,startWorkInCompany} = editData;
-        const result = await updateData("https://localhost:7083/techician/update", {id: Number(id), name, phone, specialization, startWork,startWorkInCompany});
+        const result = await updateData("http://localhost:5000/technician/update", {id: Number(id), name, phone, specialization, startWork,startWorkInCompany});
             if(result){
                 const newData = [...data];
                 const index = newData.findIndex(item => item.id === id);
@@ -83,13 +83,15 @@ function Technician(){
         </div>
         <button className={styles.addBtn} onClick={() => setModalVisible(true)}>Add Data</button>
         <div className={styles.cards}>
-        {!data ? (<span style={{fontSize: "2rem", margin:"5%"}}>No warehouse found</span>) : 
+        {!data ? (<span style={{fontSize: "2rem", margin:"5%"}}>No technician found</span>) : 
                         data.filter((item) => item.specialization.toLowerCase().includes(filterName.toLowerCase())).map((item) => {
                             return (
-                                <div key={item.id} className={styles.card}>
+                                <div key={item.id} className={styles.card} style={{height: "35vh", width: "15%"}}>
                                     <div className={styles.cardInfo}>
                                         <span className={styles.name}>{item.name}</span>
-                                        <span className={styles.address}>{item.address}</span>
+                                        <span className={styles.address}>{item.phone}</span>
+                                        <span className={styles.address}>{item.specialization}</span>
+                                        <span className={styles.address}>{item.startWork}</span>
                                     </div>
                                     <button className={styles.removeBtn} onClick={() => RemoveData(item.id)}>Remove</button>
                                     <button className={styles.updateBtn} onClick={() => EditData(item)}>Update</button>
