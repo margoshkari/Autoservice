@@ -5,11 +5,15 @@ import {getAllData, addData, removeData, updateData} from '../modules/requests';
 
 function Category(){
     const [data, setData] = useState([]);
-    const [editData, setEditData] = useState({name: '', parentCategory: null});
+    const [editData, setEditData] = useState({name: '', parentCategory: undefined});
     const [category, setCategory] = useState({});
     const [modalVisible, setModalVisible] = useState(false);
     const [searchName, setSearchName] = useState('');
     const isMountedRef = useRef(false);
+    const [validity, setValidity] = useState({
+        name: true,
+        parentCategory: true,
+      });
 
     useEffect(() => {
         if (isMountedRef.current) {
@@ -21,7 +25,7 @@ function Category(){
 
     //ПОЛУЧЕНИЕ ВСЕХ КАТЕГОРИЙ
     async function GetAllData(){
-        const result = await getAllData("https://localhost:7083/category");
+        const result = await getAllData("/category");
         setData(result);
     }
     //ПОЛУЧЕНИЕ КАТЕГОРИИ ПО ID
@@ -61,23 +65,21 @@ function Category(){
     }
     //ДОБАВЛЕНИЕ
     async function AddData(){
-        const {name, parentCategory} = editData;
-        if(name.length > 0 && parentCategory >= 0){
-            const result = await addData("https://localhost:7083/category/create", {
+        setValidity({name: true, parentCategory: true});
+        if(validate()){
+            const {name, parentCategory} = editData;
+            const result = await addData("/category/create", {
                 name: name, 
                 parentCategory: parentCategory ? Number(parentCategory) : null
             });
             setData([...data, result])
             setModalVisible(false);
-            setEditData({ name: '', parentCategory: null });
-        }
-        else{
-            Cancel();
+            setEditData({ name: '', parentCategory: undefined });
         }
     }
     //УДАЛЕНИЕ
     async function RemoveData(id){
-        const result = await removeData(`https://localhost:7083/category/delete/${id}`);
+        const result = await removeData(`/category/delete/${id}`);
         if(result){
             setData(removeChildren(data, id));
         }
@@ -92,9 +94,10 @@ function Category(){
       };
     //ОБНОВЛЕНИЕ
     async function UpdateData() {
-        const {id, name, parentCategory} = editData;
-        if(name.length > 0){
-            const result = await updateData("https://localhost:7083/category/update", {
+        setValidity({name: true, parentCategory: true});
+        if(validate()){
+            const {id, name, parentCategory} = editData;
+            const result = await updateData("/category/update", {
                 id: Number(id),
                 name: name, 
                 parentCategory: parentCategory ? Number(parentCategory) : null
@@ -105,29 +108,49 @@ function Category(){
                 newData[index] = {id: Number(id), name: name, address: parentCategory};
                 GetAllData();
             }
+            setModalVisible(false);
+            setEditData({ name: '', parentCategory: undefined }); 
         }
-        else{
-            Cancel();
-        }
-        setModalVisible(false);
-        setEditData({ name: '', parentCategory: null }); 
       }
       function EditData(item){
         setEditData(item); 
         setModalVisible(true);
+        setValidity({name: true, parentCategory: true});    
     }
     function Cancel(){
         setModalVisible(false);
         setEditData({ name: '', parentCategory: null }); 
     }
+    function validate() {
+        let isValid = true;
+        if (!editData.name) {
+          isValid = false;
+          setValidity((prevValidity) => ({ ...prevValidity, name: false }));
+        }
+        if(!editData.parentCategory){
+            setValidity((prevValidity) => ({ ...prevValidity, parentCategory: true }));
+        }
+        else if (editData.parentCategory < 1 || !data.some(item => item.id == editData.parentCategory)) {
+          isValid = false;
+          setValidity((prevValidity) => ({ ...prevValidity, parentCategory: false }));
+        }
+        return isValid;
+      }
     return (
         <div className={styles.content}>
             {modalVisible && (
             <div className={styles.modal}>
                 <div className={styles.modalBlock}>
                     <button className={styles.cancelBtn} onClick={Cancel}>X</button>
-                    <input placeholder='Name...' value={editData.name} onChange={(e) => setEditData({ ...editData, name: e.target.value })}></input>
-                    <input type={'number'} placeholder='Parent Category ID...' value={editData.parentCategory} onChange={(e) => setEditData({ ...editData, parentCategory: e.target.value })}></input>
+
+                    <input placeholder='Name...' value={editData.name} 
+                    className={!validity.name ? styles.invalid : ''}
+                    onChange={(e) => setEditData({ ...editData, name: e.target.value })}></input>
+
+                    <input type={'number'} placeholder='Parent Category ID...' value={editData.parentCategory} 
+                    className={!validity.parentCategory ? styles.invalid : ''}
+                    onChange={(e) => setEditData({ ...editData, parentCategory: e.target.value })}></input>
+
                     {!editData.id ? 
                     <button className={styles.modalAddBtn} onClick={AddData}>Add</button> :
                     <button className={styles.modalAddBtn} onClick={UpdateData}>Update</button>
@@ -139,7 +162,10 @@ function Category(){
             <div>
                 <input className={styles.search} placeholder='Name...' value={searchName} onChange={(e) => setSearchName(e.target.value)}></input>
             </div>
-            <button className={styles.addBtn} onClick={() => setModalVisible(true)}>Add Data</button>
+            <button className={styles.addBtn} onClick={() => {
+                setModalVisible(true);
+                setValidity({name: true, parentCategory: true})
+                }}>Add Data</button>
             <div className={styles.cards}>
                         {!data ? (<span style={{fontSize: "2rem", margin:"5%"}}>No category found</span>) : 
                             data.filter((item) => item.name.toLowerCase().includes(searchName.toLowerCase())).map((item) => {

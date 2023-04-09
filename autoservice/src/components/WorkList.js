@@ -8,6 +8,12 @@ function WorkList(){
     const [modalVisible, setModalVisible] = useState(false);
     const [filterName, setFilterName] = useState('');
     const isMountedRef = useRef(false);
+    const [validity, setValidity] = useState({
+        name: true,
+        description: true,
+        price: true,
+        duration: true,
+      });
 
     useEffect(() => {
         if (isMountedRef.current) {
@@ -19,25 +25,28 @@ function WorkList(){
 
     //ПОЛУЧЕНИЕ ВСЕХ УСЛУГ
     async function GetAllData(){
-        const result = await getAllData("https://localhost:7083/worklist");
+        const result = await getAllData("http://localhost:5000/worklist");
         setData(result);
     }
     //ДОБАВЛЕНИЕ
     async function AddData(){
-        const {name, description, price, duration} = editData;
-        const result = await addData("https://localhost:7083/worklist/create", {
-            name: name,
-            description: description,
-            price: Number(price),
-            duration: Number(duration)
-            });
-        setData([...data, result]);
-        setModalVisible(false);
-        setEditData({name: '', description: '', price: 0, duration: 0});
+        setValidity({name: true, description: true, price: true, duration: true});
+        if(validate()){
+            const {name, description, price, duration} = editData;
+            const result = await addData("http://localhost:5000/worklist/create", {
+                name: name,
+                description: description,
+                price: Number(price),
+                duration: Number(duration)
+                });
+            setData([...data, result]);
+            setModalVisible(false);
+            setEditData({name: '', description: '', price: 0, duration: 0});
+        }
     };
     //УДАЛЕНИЕ
     async function RemoveData(id){
-        const result = await removeData(`https://localhost:7083/worklist/delete/${id}`);
+        const result = await removeData(`http://localhost:5000/worklist/delete/${id}`);
         if(result){
             const newData = data.filter(item => item.id !== id);
             setData(newData);
@@ -45,53 +54,94 @@ function WorkList(){
     }
     //ОБНОВЛЕНИЕ
     async function UpdateData() {
-        const {id, name, description, price, duration} = editData;
-        const result = await updateData("https://localhost:7083/worklist/update", {
-                id: Number(id),
-                name: name,
-                description: description,
-                price: Number(price),
-                duration: Number(duration)
-            });
-            if(result){
-                const newData = [...data];
-                const index = newData.findIndex(item => item.id === Number(id));
-                newData[index] = {id: Number(id), name: name, description: description, price: Number(price), duration: Number(duration)};
-                setData(newData);
-            }
-        setModalVisible(false);
-        setEditData({name: '', description: '', price: 0, duration: 0});
+        setValidity({name: true, description: true, price: true, duration: true});
+        if(validate()){
+            const {id, name, description, price, duration} = editData;
+            const result = await updateData("http://localhost:5000/worklist/update", {
+                    id: Number(id),
+                    name: name,
+                    description: description,
+                    price: Number(price),
+                    duration: Number(duration)
+                });
+                if(result){
+                    const newData = [...data];
+                    const index = newData.findIndex(item => item.id === Number(id));
+                    newData[index] = {id: Number(id), name: name, description: description, price: Number(price), duration: Number(duration)};
+                    setData(newData);
+                }
+            setModalVisible(false);
+            setEditData({name: '', description: '', price: 0, duration: 0});
+        }
       }
       function EditData(item){
         setModalVisible(true);
         setEditData(item);
+        setValidity({name: true, description: true, price: true, duration: true});
     }
     function Cancel(){
         setModalVisible(false);
         setEditData({name: '', description: '', price: 0, duration: 0});
     }
+    function validate() {
+        let isValid = true;
+        if (!editData.name) {
+          isValid = false;
+          setValidity((prevValidity) => ({ ...prevValidity, name: false }));
+        }
+        if (!editData.description) {
+          isValid = false;
+          setValidity((prevValidity) => ({ ...prevValidity, description: false }));
+        }
+        if (!editData.price || editData.price < 1) {
+          isValid = false;
+          setValidity((prevValidity) => ({ ...prevValidity, price: false }));
+        }
+        if (!editData.duration || editData.duration < 1) {
+          isValid = false;
+          setValidity((prevValidity) => ({ ...prevValidity, duration: false }));
+        }
+        return isValid;
+      }
     return(
         <div className={styles.content}>
             {modalVisible && (
             <div className={styles.modal}>
                 <div className={styles.modalBlock}>
                     <button className={styles.cancelBtn} onClick={Cancel}>X</button>
-                    <input placeholder='Name...' value={editData.name} onChange={(e) => setEditData({...editData, name: e.target.value})}></input>
-                    <input placeholder='Description...' value={editData.description} onChange={(e) => setEditData({...editData, description: e.target.value})}></input>
-                    <input type={'number'} placeholder='Price...' value={editData.price} onChange={(e) => setEditData({...editData, price: e.target.value})}></input>
-                    <input type={'number'} placeholder='Duration...' value={editData.duration} onChange={(e) => setEditData({...editData, duration: e.target.value})}></input>
+
+                    <input placeholder='Name...' value={editData.name} 
+                    className={!validity.name ? styles.invalid : ''}
+                    onChange={(e) => setEditData({...editData, name: e.target.value})}></input>
+                    
+                    <input placeholder='Description...' value={editData.description} 
+                    className={!validity.description ? styles.invalid : ''}
+                    onChange={(e) => setEditData({...editData, description: e.target.value})}></input>
+                    
+                    <input type={'number'} placeholder='Price...' value={editData.price} 
+                    className={!validity.price ? styles.invalid : ''}
+                    onChange={(e) => setEditData({...editData, price: e.target.value})}></input>
+                    
+                    <input type={'number'} placeholder='Duration...' value={editData.duration} 
+                    className={!validity.duration ? styles.invalid : ''}
+                    onChange={(e) => setEditData({...editData, duration: e.target.value})}></input>
+                    
                     {!editData.id ? 
                     <button className={styles.modalAddBtn} onClick={AddData}>Add</button> :
                     <button className={styles.modalAddBtn} onClick={UpdateData}>Update</button>
                     }
-                    
                 </div>
             </div>
             )}
             <div>
                 <input className={styles.search} placeholder='Name...' value={filterName} onChange={(e) => setFilterName(e.target.value)}></input>
             </div>
-            <button className={styles.addBtn} onClick={() => setModalVisible(true)}>Add Data</button>
+
+            <button className={styles.addBtn} onClick={() => {
+                setModalVisible(true);
+                setValidity({name: true, description: true, price: true, duration: true});
+                }}>Add Data</button>
+
             <div className={styles.cards}>
                         {!data ? (<span style={{fontSize: "2rem", margin:"5%"}}>No detail found</span>) : 
                             data.filter((item) => item.name.toLowerCase().includes(filterName.toLowerCase())).map((item) => {

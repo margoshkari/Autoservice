@@ -7,7 +7,11 @@ function Warehouse(){
     const [editData, setEditData] = useState({name: '', address: ''});
     const [modalVisible, setModalVisible] = useState(false);
     const [filterName, setFilterName] = useState('');
-    const isMountedRef = useRef(false);
+    const isMountedRef = useRef(false); 
+    const [validity, setValidity] = useState({
+        name: true,
+        address: true,
+      });
 
     useEffect(() => {
         if (isMountedRef.current) {
@@ -39,15 +43,13 @@ function Warehouse(){
     }
     //ДОБАВЛЕНИЕ
     async function AddNewData(){
-        const { name, address } = editData;
-        if(name.length > 0 && address.length > 0){
+        setValidity({name: true, address: true});
+        if(validate()){
+            const { name, address } = editData;
             const result = await addData("/warehouse/create", {name, address});
             setData([...data, result])
             setModalVisible(false);
             setEditData({ name: '', address: '' });
-        }
-        else{
-            Cancel();
         }
     }
     //УДАЛЕНИЕ
@@ -60,8 +62,9 @@ function Warehouse(){
     }
     //ОБНОВЛЕНИЕ
     async function UpdateData() {
-        const {id, name, address} = editData;
-        if(name.length > 0 && address.length > 0){
+        setValidity({name: true, address: true});
+        if(validate()){
+            const {id, name, address} = editData;
             const result = await updateData("/warehouse/update", {id: Number(id), name, address});
             if(result){
                 const newData = [...data];
@@ -72,26 +75,41 @@ function Warehouse(){
             }
             setModalVisible(false);
             setEditData({ name: '', address: '' });
-        } else {
-            Cancel();
         }
       }
       function EditData(item){
         setEditData(item);
         setModalVisible(true);
+        setValidity({name: true, address: true})
     }
     function Cancel(){
         setModalVisible(false);
         setEditData({ name: '', address: '' });
     }
+    function validate() {
+        let isValid = true;
+        if (!editData.name) {
+          isValid = false;
+          setValidity((prevValidity) => ({ ...prevValidity, name: false }));
+        }
+        if (!editData.address) {
+          isValid = false;
+          setValidity((prevValidity) => ({ ...prevValidity, address: false }));
+        }
+        return isValid;
+      }
     return (
         <div className={styles.content}>
             {modalVisible && (
             <div className={styles.modal}>
                 <div className={styles.modalBlock}>
                     <button className={styles.cancelBtn} onClick={Cancel}>X</button>
-                    <input placeholder='Name...' value={editData.name} onChange={(e) => setEditData({ ...editData, name: e.target.value })}></input>
-                    <input placeholder='Address...' value={editData.address} onChange={(e) => setEditData({ ...editData, address: e.target.value })}></input>
+                    <input placeholder='Name...' value={editData.name} 
+                    className={!validity.name ? styles.invalid : ''}
+                    onChange={(e) => setEditData({ ...editData, name: e.target.value })}></input>
+                    <input placeholder='Address...' value={editData.address} 
+                    className={!validity.address ? styles.invalid : ''}
+                    onChange={(e) => setEditData({ ...editData, address: e.target.value })}></input>
                     {!editData.id ? 
                     <button className={styles.modalAddBtn} onClick={AddNewData}>Add</button> :
                     <button className={styles.modalAddBtn} onClick={UpdateData}>Update</button>
@@ -103,7 +121,10 @@ function Warehouse(){
              <div>
                 <input className={styles.search} placeholder='Name...' value={filterName} onChange={(e) => setFilterName(e.target.value)}></input>
             </div>
-            <button className={styles.addBtn} onClick={() => setModalVisible(true)}>Add Data</button>
+            <button className={styles.addBtn} onClick={() => {
+                setModalVisible(true);
+                setValidity({name: true, address: true})
+                }}>Add Data</button>
             <div className={styles.cards}>
             {!data ? (<span style={{fontSize: "2rem", margin:"5%"}}>No warehouse found</span>) : 
                             data.filter((item) => item.name.toLowerCase().includes(filterName.toLowerCase())).map((item) => {

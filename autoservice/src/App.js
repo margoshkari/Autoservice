@@ -9,7 +9,7 @@ import Technician from "./components/Technician"
 function App() {
   return (
     <div className="App">
-     <Technician />
+     <WorkList />
     </div>
   );
 }
